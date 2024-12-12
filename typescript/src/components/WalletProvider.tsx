@@ -1,28 +1,14 @@
 "use client";
 
-// Internal components
-import { useToast } from "@/components/ui/use-toast";
-// Internal constants
-import { APTOS_API_KEY, NETWORK } from "@/constants";
 import { AptosWalletAdapterProvider } from "@aptos-labs/wallet-adapter-react";
-import type { PropsWithChildren } from "react";
+import { PetraWallet } from "petra-plugin-wallet-adapter";
+import { ReactNode } from "react";
 
-export function WalletProvider({ children }: PropsWithChildren) {
-  const { toast } = useToast();
+export function WalletProvider({ children }: { children: ReactNode }) {
+  const wallets = [new PetraWallet()];
 
   return (
-    <AptosWalletAdapterProvider
-      autoConnect={true}
-      dappConfig={{ network: NETWORK, aptosApiKey: APTOS_API_KEY }}
-      optInWallets={["Continue with Google","Petra","Nightly","Pontem Wallet", "Mizu Wallet"]}
-      onError={(error) => {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: error || "Unknown wallet error",
-        });
-      }}
-    >
+    <AptosWalletAdapterProvider plugins={wallets} autoConnect={false}>
       {children}
     </AptosWalletAdapterProvider>
   );
