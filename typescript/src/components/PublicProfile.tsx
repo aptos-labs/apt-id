@@ -26,6 +26,7 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
             <h1 className="text-[20px] sm:text-[24px] font-semibold text-white mb-2">
               @{profile.ansName.replace('.apt', '')}
             </h1>
+            <h2 className="text-[16px] sm:text-[18px] text-white/80 mb-8">{profile.name}</h2>
             <p className="text-[16px] sm:text-[18px] text-white/80 mb-8">
               {profile.description}
             </p>
