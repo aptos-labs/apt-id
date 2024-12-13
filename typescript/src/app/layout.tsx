@@ -3,7 +3,7 @@ import { WalletProvider } from "../components/WalletProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Aptos Linktree",
+  title: "Aptos Profile",
   description: "Your Aptos Profile Links",
 };
 
