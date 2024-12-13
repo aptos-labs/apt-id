@@ -19,9 +19,6 @@ export async function generateStaticParams() {
   
   // Return both mock profiles and the module address path
   return [
-    ...Object.keys(MOCK_PROFILES).map((name) => ({
-      name: name,
-    })),
     {
       name: userAddress,
     }
@@ -37,7 +34,7 @@ export default async function ProfilePage({
   
   // Server-side data fetching
   const address = await state.client.ans.getTargetAddress({name: params.name})
-    .catch(() => AccountAddress.from(params.name));
+    .catch(() => undefined);
 
   const bio = address ? await state.client.view<[Bio]>({
     payload: {
@@ -59,21 +56,23 @@ export default async function ProfilePage({
     title: link.key,
     url: link.value.url
   })) ?? [];
+  
+  // Add .apt suffix if it's missing
+  const ansName = params.name.endsWith('.apt') ? params.name : `${params.name}.apt`;
 
+  console.log(JSON.stringify(bio, null, 2));
+  console.log(JSON.stringify(links, null, 2));
+
+  // Create a profile using the URL parameter as the ANS name
   const profile = {
     owner: address?.toStringLong() ?? "",
-    ansName: params.name,
+    ansName: ansName,
     name: bio?.name ?? "",
     profilePicture: bio?.avatar_url ?? "",
     description: bio?.bio ?? "",
     title: bio?.name ?? "",
     links: linkArray,
   }
-
-  console.log("address: ", address?.toStringLong());
-  console.log("bio: ", JSON.stringify(bio, null, 2));
-  console.log("links: ", JSON.stringify(links, null, 2));
-  console.log("profile: ", JSON.stringify(profile, null, 2));
 
   if (!profile) {
     return (
@@ -82,6 +81,6 @@ export default async function ProfilePage({
       </div>
     );
   }
-
+  
   return <ProfileClient profile={profile} />;
 } 
