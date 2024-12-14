@@ -1,7 +1,7 @@
 import {Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 import ProfileClient from './ProfileClient';
 
-const CONTRACT_ADDRESS = "0x082a4da7681abcd717a387f97da7c929157dcc585011fee6e8d4a749db9590d7";
+const CONTRACT_ADDRESS = "0xb11affd5c514bb969e988710ef57813d9556cc1e3fe6dc9aa6a82b56aee53d98";
 
 type ImageBio = {__variant__: "Image", avatar_url: string, bio:string, name: string}
 type NFTBio = {__variant__: "NFT", nft_url: {inner: string}, bio: string, name: string}
@@ -74,14 +74,11 @@ export default async function ProfilePage({
       url: link.value.url
     })) ?? [];
 
-    console.log("DATA", inner);
     return inner 
 }).catch(() => undefined) : undefined;
 
   // Add .apt suffix if it's missing
   const ansName = params.name.endsWith('.apt') ? params.name : `${params.name}.apt`;
-  console.log(JSON.stringify(bio, null, 2));
-  console.log(JSON.stringify(links, null, 2));
 
   // Create a profile using the URL parameter as the ANS name
   const profile = {

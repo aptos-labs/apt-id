@@ -5,7 +5,7 @@ import { Profile, Link } from '../types';
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Link as LinkIcon } from 'lucide-react'; // Add LinkIcon
 
-const CONTRACT_ADDRESS = "0x082a4da7681abcd717a387f97da7c929157dcc585011fee6e8d4a749db9590d7";
+const CONTRACT_ADDRESS = "0xb11affd5c514bb969e988710ef57813d9556cc1e3fe6dc9aa6a82b56aee53d98";
 
 interface ProfileEditorProps {
   profile?: Profile;
@@ -49,7 +49,12 @@ export function ProfileEditor({ profile, onViewProfile, loading = false }: Profi
     try {
       // Check if profile exists using view function
       const response = await fetch(`/api/profile/exists?address=${account.address}`);
-      const profileExists = await response.json();
+      let profileExists = false;
+
+      // TODO: Verify that the profile API is working, and remove this check or handle 404 properly elsewhere
+      if (response.status !== 404) {
+        profileExists = await response.json();
+      }
 
       if (!profileExists) {
         // Create profile if it doesn't exist
@@ -60,8 +65,8 @@ export function ProfileEditor({ profile, onViewProfile, loading = false }: Profi
             functionArguments: [
               bio,                  // name: String
               bio,                  // bio: String
-              avatar ? { vec: [avatar] } : { vec: [] },  // avatar_url: Option<String>
-              { vec: [] },          // avatar_nft: Option<Object<Token>> - always empty for now
+              avatar,               // avatar_url: Option<String>
+              undefined,            // avatar_nft: Option<Object<Token>> - always empty for now
               links.map(link => link.title),  // names: vector<String>
               links.map(link => link.url),    // links: vector<String>
             ],
@@ -76,8 +81,8 @@ export function ProfileEditor({ profile, onViewProfile, loading = false }: Profi
             functionArguments: [
               bio,                  // name: String
               bio,                  // bio: String
-              avatar ? { vec: [avatar] } : { vec: [] },  // avatar_url: Option<String>
-              { vec: [] }           // avatar_nft: Option<Object<Token>> - always empty for now
+              avatar,               // avatar_url: Option<String>
+              undefined             // avatar_nft: Option<Object<Token>> - always empty for now
             ],
           },
         });
@@ -92,8 +97,8 @@ export function ProfileEditor({ profile, onViewProfile, loading = false }: Profi
               function: `${CONTRACT_ADDRESS}::profile::add_links`,
               typeArguments: [],
               functionArguments: [
-                { vec: names },     // names: vector<String>
-                { vec: urls }       // links: vector<String>
+                names,     // names: vector<String>
+                urls       // links: vector<String>
               ],
             },
           });
