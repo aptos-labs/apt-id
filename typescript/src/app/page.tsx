@@ -4,6 +4,7 @@ import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useRouter } from "next/navigation";
 import { TopBar } from "../components/TopBar";
 import { useAptosName } from "../hooks/useAptosName";
+import { ProfileEditor } from "../components/ProfileEditor";
 
 export default function Home() {
   const { connected } = useWallet();
@@ -28,25 +29,21 @@ export default function Home() {
       <TopBar />
       <main className="min-h-screen bg-gradient-to-b from-[#D8B4FE] to-[#818CF8] flex items-center justify-center pt-16">
         <div className="w-full max-w-[680px] mx-auto px-4">
-          <div className="flex flex-col items-center gap-6">
-            <h1 className="text-3xl font-bold text-white">Aptos Profile</h1>
-            <div className="flex flex-col items-center gap-4">
-              <p className="text-white/80 text-center">
-                {connected ? "Create your profile" : "Connect your wallet to create your profile"}
-              </p>
+          {!connected ? (
+            <div className="flex flex-col items-center gap-6">
+              <h1 className="text-3xl font-bold text-white">Aptos Profile</h1>
+              <div className="flex flex-col items-center gap-4">
+                <p className="text-white/80 text-center">
+                  Connect your wallet to create your profile
+                </p>
+              </div>
             </div>
-            {connected && (
-              <button
-                onClick={handleViewProfile}
-                disabled={loading}
-                className="px-6 py-3 bg-white/90 hover:bg-white rounded-lg transition-all
-                         text-[#000000] font-semibold shadow-md hover:scale-[1.02]
-                         disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? "Loading..." : "View Your Public Profile"}
-              </button>
-            )}
-          </div>
+          ) : (
+            <div className="flex flex-col gap-6">
+              <h1 className="text-3xl font-bold text-white text-center">Edit Your Profile</h1>
+              <ProfileEditor onViewProfile={handleViewProfile} loading={loading} />
+            </div>
+          )}
         </div>
       </main>
     </>
