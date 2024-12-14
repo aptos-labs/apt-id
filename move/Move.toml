@@ -4,7 +4,7 @@ version = "1.0.0"
 authors = []
 
 [addresses]
-lt_address = "_"
+profile_address = "_"
 
 [dev-addresses]
 profile_address = "0x1234567890abcdef"
