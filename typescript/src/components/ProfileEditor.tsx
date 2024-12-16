@@ -114,7 +114,7 @@ export function ProfileEditor({ profile, onViewProfile, loading = false }: Profi
   };
 
   const getButtonsMarginTop = () => {
-    return links.some(link => editingLinkId === link.id) ? 'mt-24' : 'mt-4';
+    return links.some(link => editingLinkId === link.id) ? 'mt-32' : 'mt-8';
   };
 
   return (
@@ -155,69 +155,70 @@ export function ProfileEditor({ profile, onViewProfile, loading = false }: Profi
       </header>
 
       {/* Links Section */}
-      <section className="space-y-3 mb-8 w-full max-w-[500px] mx-auto relative">
-        <div className="space-y-6">
+      <section className="space-y-3 mb-8 w-full max-w-[500px] mx-auto">
+        <div className="space-y-4">
           {links.map((link) => (
-            <div key={link.id} className="group relative">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={link.title}
-                  onChange={(e) => handleUpdateLink(link.id, 'title', e.target.value)}
-                  placeholder="Link Title"
-                  className="flex-1 px-4 py-[14px] sm:py-4 text-[14px] sm:text-[16px] font-semibold 
-                           text-center bg-white/90 group-hover:bg-white 
-                           text-[#000000] rounded-[14px] transition-all 
-                           duration-200 backdrop-blur-sm shadow-md
-                           focus:outline-none"
-                />
-                <button
-                  onClick={() => {
-                    if (editingLinkId === link.id) {
-                      setEditingLinkId(null);
-                    } else {
-                      setEditingLinkId(link.id);
-                    }
-                  }}
-                  className={`w-[52px] px-4 py-[14px] ${
-                    editingLinkId === link.id 
-                      ? 'bg-white text-black' 
-                      : 'bg-white/90 hover:bg-white text-black'
-                  } rounded-[14px] transition-all shadow-md flex items-center justify-center`}
-                >
-                  <LinkIcon size={16} />
-                </button>
-                <button
-                  onClick={() => handleDeleteLink(link.id)}
-                  className="w-[52px] px-4 py-[14px] bg-red-500/90 hover:bg-red-500 text-white rounded-[14px] 
-                           transition-all shadow-md flex items-center justify-center"
-                >
-                </button>
-              </div>
-              <div className={`absolute left-0 right-0 top-full mt-2 transition-all duration-200 ${
-                editingLinkId === link.id ? 'opacity-100 visible' : 'opacity-0 invisible'
-              }`}>
-                <input
-                  type="text"
-                  value={link.url}
-                  onChange={(e) => handleUpdateLink(link.id, 'url', e.target.value)}
-                  placeholder="Enter URL"
-                  className="w-full px-4 py-[14px] sm:py-4 text-[14px] sm:text-[16px] 
-                           text-center bg-white/90 focus:bg-white 
-                           text-[#000000] rounded-[14px] transition-all 
-                           duration-200 backdrop-blur-sm shadow-md
-                           focus:outline-none"
-                  autoFocus
-                />
+            <div key={link.id} className="group">
+              <div className="grid grid-cols-1 gap-2">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={link.title}
+                    onChange={(e) => handleUpdateLink(link.id, 'title', e.target.value)}
+                    placeholder="Link Title"
+                    className="flex-1 px-4 py-[14px] sm:py-4 text-[14px] sm:text-[16px] font-semibold 
+                             text-center bg-white/90 group-hover:bg-white 
+                             text-[#000000] rounded-[14px] transition-all 
+                             duration-200 backdrop-blur-sm shadow-md
+                             focus:outline-none"
+                  />
+                  <button
+                    onClick={() => {
+                      if (editingLinkId === link.id) {
+                        setEditingLinkId(null);
+                      } else {
+                        setEditingLinkId(link.id);
+                      }
+                    }}
+                    className={`w-[52px] px-4 py-[14px] ${
+                      editingLinkId === link.id 
+                        ? 'bg-white text-black' 
+                        : 'bg-white/90 hover:bg-white text-black'
+                    } rounded-[14px] transition-all shadow-md flex items-center justify-center`}
+                  >
+                    <LinkIcon size={16} />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteLink(link.id)}
+                    className="w-[52px] px-4 py-[14px] bg-red-500/90 hover:bg-red-500 text-white rounded-[14px] 
+                             transition-all shadow-md flex items-center justify-center text-xl font-bold"
+                  >
+                    ×
+                  </button>
+                </div>
+                {editingLinkId === link.id && (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={link.url}
+                      onChange={(e) => handleUpdateLink(link.id, 'url', e.target.value)}
+                      placeholder="Enter URL"
+                      className="flex-1 px-4 py-[14px] sm:py-4 text-[14px] sm:text-[16px] 
+                               text-center bg-white/90 focus:bg-white 
+                               text-[#000000] rounded-[14px] transition-all 
+                               duration-200 backdrop-blur-sm shadow-md
+                               focus:outline-none"
+                      autoFocus
+                    />
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
 
         {/* Action Buttons */}
-        <div 
-          className={`space-y-2 w-full max-w-[500px] mx-auto transition-all duration-300 ease-in-out ${getButtonsMarginTop()}`}
-        >
+        <div className="space-y-4 w-full max-w-[500px] mx-auto mt-8">
           <div className="flex gap-2">
             <button
               onClick={handleAddLink}
