@@ -5,15 +5,76 @@ import { useRouter } from "next/navigation";
 import { TopBar } from "../components/TopBar";
 import { useAptosName } from "../hooks/useAptosName";
 import { ProfileEditor } from "../components/ProfileEditor";
+import { useEffect, useState } from "react";
+import { Profile } from "../types";
+
+const CONTRACT_ADDRESS = "0xb11affd5c514bb969e988710ef57813d9556cc1e3fe6dc9aa6a82b56aee53d98";
 
 export default function Home() {
-  const { connected } = useWallet();
+  const { connected, account } = useWallet();
   const router = useRouter();
-  const { ansName, loading } = useAptosName();
+  const { ansName, loading: ansLoading } = useAptosName();
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!account?.address) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        console.log('Fetching profile for address:', account.address.toString());
+        
+        // Fetch bio
+        const bioResponse = await fetch(`/api/profile/bio?address=${account.address}`);
+        const bio = await bioResponse.json();
+        console.log('Fetched bio:', bio);
+
+        // Fetch links
+        const linksResponse = await fetch(`/api/profile/links?address=${account.address}`);
+        const links = await linksResponse.json();
+        console.log('Fetched links:', links);
+
+        if (bio?.error) {
+          console.log('Bio fetch error:', bio.error);
+          setProfile(null);
+          setLoading(false);
+          return;
+        }
+
+        // Create profile object
+        const profileData: Profile = {
+          owner: account.address.toString(),
+          ansName: ansName || account.address.toString(),
+          name: bio?.name || "",
+          profilePicture: bio?.avatar_url || "",
+          description: bio?.bio || "",
+          title: bio?.name || "",
+          links: Array.isArray(links) ? links : []
+        };
+
+        console.log('Setting profile data:', profileData);
+        setProfile(profileData);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        setProfile(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (connected && account?.address) {
+      fetchProfile();
+    } else {
+      setLoading(false);
+    }
+  }, [connected, account?.address, ansName]);
 
   const handleViewProfile = async () => {
     if (connected) {
-      if (loading) {
+      if (loading || ansLoading) {
         return;
       }
       if (ansName) {
@@ -41,7 +102,15 @@ export default function Home() {
           ) : (
             <div className="flex flex-col gap-6">
               <h1 className="text-3xl font-bold text-white text-center">Edit Your Profile</h1>
-              <ProfileEditor onViewProfile={handleViewProfile} loading={loading} />
+              {loading ? (
+                <div className="text-white text-center">Loading profile...</div>
+              ) : (
+                <ProfileEditor 
+                  profile={profile || undefined} 
+                  onViewProfile={handleViewProfile} 
+                  loading={ansLoading} 
+                />
+              )}
             </div>
           )}
         </div>

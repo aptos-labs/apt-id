@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Profile, Link } from '../types';
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Link as LinkIcon } from 'lucide-react'; // Add LinkIcon
@@ -15,11 +15,21 @@ interface ProfileEditorProps {
 
 export function ProfileEditor({ profile, onViewProfile, loading = false }: ProfileEditorProps) {
   const { account, signAndSubmitTransaction } = useWallet();
-  const [bio, setBio] = useState(profile?.description || '');
-  const [avatar, setAvatar] = useState(profile?.profilePicture || '');
-  const [links, setLinks] = useState<Link[]>(profile?.links || []);
+  const [bio, setBio] = useState<string>('');
+  const [avatar, setAvatar] = useState<string>('');
+  const [links, setLinks] = useState<Link[]>([]);
   const [saving, setSaving] = useState(false);
   const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
+
+  // Initialize state with profile data when it becomes available
+  useEffect(() => {
+    console.log('Profile data received:', profile);
+    if (profile) {
+      setBio(profile.description || '');
+      setAvatar(profile.profilePicture || '');
+      setLinks(profile.links || []);
+    }
+  }, [profile]);
 
   const handleAddLink = () => {
     const newLink: Link = {
