@@ -123,7 +123,7 @@ module profile_address::profile {
         bio: String,
         avatar_url: Option<String>,
         avatar_nft: Option<Object<Token>>
-    ) acquires ProfileRef, LinkTree, Controller, Bio {
+    ) acquires ProfileRef, Controller, Bio {
         let caller_address = signer::address_of(caller);
         let maybe_profile_address = get_profile_address(caller_address);
         assert!(maybe_profile_address.is_some(), E_PROFILE_DOESNT_EXIST);
