@@ -1,14 +1,25 @@
 import React from 'react';
 import { Profile } from '../types';
 import { TopBar } from "./TopBar";
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import { useRouter } from 'next/navigation';
 
 interface PublicProfileProps {
   profile: Profile;
 }
 
 export default function PublicProfile({ profile }: PublicProfileProps) {
+  const { account } = useWallet();
+  const router = useRouter();
   // Extract the username from ANS name (remove .apt)
   const username = profile.ansName.replace('.apt', '');
+  
+  // Check if the current user is the profile owner
+  const isOwner = account?.address?.toString() === profile.owner;
+
+  const handleEdit = () => {
+    router.push('/');
+  };
 
   return (
     <>
@@ -58,6 +69,22 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
               </a>
             ))}
           </section>
+
+          {/* Edit Button (only shown to profile owner) */}
+          {isOwner && (
+            <div className="w-full max-w-[500px] mx-auto mb-8">
+              <button
+                onClick={handleEdit}
+                className="w-full px-4 py-[14px] sm:py-4 text-[14px] sm:text-[16px] font-semibold
+                         text-center bg-white/30 hover:bg-white/40 
+                         text-white rounded-[14px] transition-all 
+                         duration-200 backdrop-blur-sm shadow-md
+                         hover:scale-[1.02]"
+              >
+                Edit Profile
+              </button>
+            </div>
+          )}
 
           {/* Footer */}
           <footer className="text-center mt-auto">
