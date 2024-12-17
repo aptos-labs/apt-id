@@ -1,6 +1,7 @@
 import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 import ProfileClient from "./ProfileClient";
 import { CONTRACT_ADDRESS } from "@/constants.ts";
+import { redirect } from 'next/navigation';
 
 type ImageBio = { __variant__: "Image"; avatar_url: string; bio: string; name: string };
 type NFTBio = { __variant__: "NFT"; nft_url: { inner: string }; bio: string; name: string };
@@ -29,10 +30,15 @@ interface PageProps {
 export default async function ProfilePage(props: PageProps) {
   const { params } = props;
 
+  // Redirect .apt URLs to base name
+  if (params.name.endsWith('.apt')) {
+    redirect(`/${params.name.slice(0, -4)}`);
+  }
+
   const state = await getServerState();
 
-  // Remove .apt suffix if present for ANS lookup
-  const lookupName = params.name.endsWith('.apt') ? params.name : `${params.name}.apt`;
+  // Always add .apt for ANS lookup
+  const lookupName = `${params.name}.apt`;
   
   // Server-side data fetching
   const address = await state.mainnetClient.ans.getTargetAddress({ name: lookupName })
