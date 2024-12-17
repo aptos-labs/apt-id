@@ -67,6 +67,8 @@ module profile_address::profile {
     const E_IMAGE_AND_NFT: u64 = 4;
 
     /// Creates an unordered profile
+    ///
+    /// It will also update if it already exists
     public entry fun create(
         caller: &signer,
         name: String,
@@ -75,10 +77,8 @@ module profile_address::profile {
         avatar_nft: Option<Object<Token>>,
         names: vector<String>,
         links: vector<String>
-    ) {
+    ) acquires ProfileRef, Controller, Bio, LinkTree {
         let caller_address = signer::address_of(caller);
-        assert!(!profile_exists(caller_address), E_PROFILE_EXISTS);
-
         assert!(
             (avatar_url.is_none()
                 || avatar_nft.is_none())
@@ -86,7 +86,23 @@ module profile_address::profile {
                 || avatar_nft.is_some()),
             E_IMAGE_AND_NFT
         );
+        if (profile_exists(caller_address)) {
+            update_profile(caller, name, bio, avatar_url, avatar_nft, names, links)
+        } else {
+            create_new_profile(caller, caller_address, name, bio, avatar_url, avatar_nft, names, links)
+        }
+    }
 
+    fun create_new_profile(
+        caller: &signer,
+        caller_address: address,
+        name: String,
+        bio: String,
+        avatar_url: Option<String>,
+        avatar_nft: Option<Object<Token>>,
+        names: vector<String>,
+        links: vector<String>
+    ) {
         let object_signer = create_object(caller_address);
 
         // If it's an NFT, lock it up for usage, otherwise use an image
@@ -116,6 +132,37 @@ module profile_address::profile {
         move_to(caller, ProfileRef { object_address: signer::address_of(&object_signer) });
     }
 
+    fun update_profile(
+        caller: &signer,
+        name: String,
+        bio: String,
+        avatar_url: Option<String>,
+        avatar_nft: Option<Object<Token>>,
+        names: vector<String>,
+        links: vector<String>
+    ) acquires ProfileRef, Controller, Bio, LinkTree {
+        set_bio(caller, name, bio, avatar_url, avatar_nft);
+
+        let num_names = names.length();
+        let num_links = links.length();
+        assert!(num_names == num_links, E_INPUT_MISMATCH);
+
+        let caller_address = signer::address_of(caller);
+        let maybe_profile_address = get_profile_address(caller_address);
+        assert!(maybe_profile_address.is_some(), E_PROFILE_DOESNT_EXIST);
+
+        let profile_address = maybe_profile_address.destroy_some();
+        let annotated_links = convert_links(links);
+        let profile = borrow_global_mut<LinkTree>(profile_address);
+
+        let new_map = simple_map::new();
+
+        for (i in 0..num_names) {
+            new_map.upsert(names[i], annotated_links[i])
+        };
+        profile.links = new_map;
+    }
+
     /// Update bio, by destroying previous bio
     public entry fun set_bio(
         caller: &signer,
@@ -127,6 +174,13 @@ module profile_address::profile {
         let caller_address = signer::address_of(caller);
         let maybe_profile_address = get_profile_address(caller_address);
         assert!(maybe_profile_address.is_some(), E_PROFILE_DOESNT_EXIST);
+        assert!(
+            (avatar_url.is_none()
+                || avatar_nft.is_none())
+                && (avatar_url.is_some()
+                || avatar_nft.is_some()),
+            E_IMAGE_AND_NFT
+        );
 
         let profile_address = maybe_profile_address.destroy_some();
         let object_signer =
