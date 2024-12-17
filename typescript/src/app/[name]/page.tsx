@@ -2,12 +2,12 @@ import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 import ProfileClient from "./ProfileClient";
 import { CONTRACT_ADDRESS } from "@/constants.ts";
 
-type ImageBio = { __variant__: "Image", avatar_url: string, bio: string, name: string }
-type NFTBio = { __variant__: "NFT", nft_url: { inner: string }, bio: string, name: string }
+type ImageBio = { __variant__: "Image"; avatar_url: string; bio: string; name: string };
+type NFTBio = { __variant__: "NFT"; nft_url: { inner: string }; bio: string; name: string };
 type LinkTree = {
-  __variant__: "SM",
-  links: { data: { key: string, value: { "__variant__": "UnorderedLink", "url": string } }[] }
-}
+  __variant__: "SM";
+  links: { data: { key: string; value: { "__variant__": "UnorderedLink"; "url": string } }[] };
+};
 
 async function getServerState() {
   const network = Network.DEVNET;
@@ -27,12 +27,15 @@ interface PageProps {
 }
 
 export default async function ProfilePage(props: PageProps) {
-  const { params } = await props;
+  const { params } = props;
 
   const state = await getServerState();
 
+  // Remove .apt suffix if present for ANS lookup
+  const lookupName = params.name.endsWith('.apt') ? params.name : `${params.name}.apt`;
+  
   // Server-side data fetching
-  const address = await state.mainnetClient.ans.getTargetAddress({ name: params.name })
+  const address = await state.mainnetClient.ans.getTargetAddress({ name: lookupName })
     .catch(() => undefined);
 
   const bio = address ? await state.client.view<[{ vec: [ImageBio | NFTBio] }]>({
@@ -73,13 +76,10 @@ export default async function ProfilePage(props: PageProps) {
     return inner;
   }).catch(() => undefined) : undefined;
 
-  // Add .apt suffix if it's missing
-  const ansName = params.name.endsWith(".apt") ? params.name : `${params.name}.apt`;
-
   // Create a profile using the URL parameter as the ANS name
   const profile = {
     owner: address?.toStringLong() ?? "",
-    ansName,
+    ansName: lookupName,
     name: bio?.name ?? "",
     profilePicture: bio?.avatar_url ?? "",
     description: bio?.bio ?? "",
@@ -87,7 +87,7 @@ export default async function ProfilePage(props: PageProps) {
     links: links ?? [],
   };
 
-  if (!profile) {
+  if (!profile.owner) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#D8B4FE] to-[#818CF8] flex items-center justify-center">
         <div className="text-xl text-white">Profile not found</div>
