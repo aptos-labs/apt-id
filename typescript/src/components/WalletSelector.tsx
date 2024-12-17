@@ -67,7 +67,7 @@ export function WalletSelector() {
           <DialogTitle>Connect Wallet</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-3">
-          {wallets.map((wallet) => (
+          {wallets?.map((wallet) => (
             <Button
               key={wallet.name}
               onClick={() => {

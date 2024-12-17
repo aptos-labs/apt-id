@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import PublicProfile from '../../components/PublicProfile';
-import { Profile } from '../../types';
+import { Profile } from '@/types';
 
 export default function ProfileClient({ profile }: { profile: Profile }) {
   const [loading, setLoading] = useState(true);

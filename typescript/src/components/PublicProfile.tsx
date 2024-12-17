@@ -1,8 +1,9 @@
 import React from 'react';
-import { Profile } from '../types';
+import { Profile } from '@/types';
 import { TopBar } from "./TopBar";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useRouter } from 'next/navigation';
+import Image from "next/image";
 
 interface PublicProfileProps {
   profile: Profile;
@@ -30,9 +31,11 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
           <header className="flex flex-col items-center mb-8">
             {/* Profile Picture */}
             <div className="relative w-[96px] h-[96px] mb-4 sm:w-[120px] sm:h-[120px]">
-              <img
+              <Image
                 src={profile.profilePicture || '/default-avatar.png'}
                 alt={`${username}'s profile picture`}
+                width={120}
+                height={120}
                 className="rounded-full object-cover border-2 border-white shadow-lg w-full h-full"
               />
             </div>
