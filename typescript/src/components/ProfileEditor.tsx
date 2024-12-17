@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Profile, Link } from '../types';
+import { Profile, Link } from '@/types';
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { Link as LinkIcon } from 'lucide-react'; // Add LinkIcon
-
-const CONTRACT_ADDRESS = "0xb11affd5c514bb969e988710ef57813d9556cc1e3fe6dc9aa6a82b56aee53d98";
+import { Link as LinkIcon } from 'lucide-react';
+import {CONTRACT_ADDRESS} from "@/constants.ts";
+import Image from "next/image"; // Add LinkIcon
 
 interface ProfileEditorProps {
   profile?: Profile;
@@ -123,19 +123,17 @@ export function ProfileEditor({ profile, onViewProfile, loading = false }: Profi
     }
   };
 
-  const getButtonsMarginTop = () => {
-    return links.some(link => editingLinkId === link.id) ? 'mt-32' : 'mt-8';
-  };
-
   return (
     <div className="w-full max-w-[680px] mx-auto px-4 py-8 min-h-screen flex flex-col justify-center sm:min-h-0 sm:py-12">
       {/* Profile Header */}
       <header className="flex flex-col items-center mb-8 relative">
         {/* Profile Picture */}
         <div className="relative w-[96px] h-[96px] mb-4 sm:w-[120px] sm:h-[120px] group">
-          <img
+          <Image
             src={avatar || '/default-avatar.png'}
             alt="Profile picture"
+            width={120}
+            height={120}
             className="rounded-full object-cover border-2 border-white shadow-lg w-full h-full"
           />
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">

@@ -1,11 +1,13 @@
-import {Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
-import ProfileClient from './ProfileClient';
+import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
+import ProfileClient from "./ProfileClient";
+import { CONTRACT_ADDRESS } from "@/constants.ts";
 
-const CONTRACT_ADDRESS = "0xb11affd5c514bb969e988710ef57813d9556cc1e3fe6dc9aa6a82b56aee53d98";
-
-type ImageBio = {__variant__: "Image", avatar_url: string, bio:string, name: string}
-type NFTBio = {__variant__: "NFT", nft_url: {inner: string}, bio: string, name: string}
-type LinkTree = { __variant__: 'SM', links: {data:{key: string, value: {"__variant__": "UnorderedLink", "url": string}}[]}}
+type ImageBio = { __variant__: "Image", avatar_url: string, bio: string, name: string }
+type NFTBio = { __variant__: "NFT", nft_url: { inner: string }, bio: string, name: string }
+type LinkTree = {
+  __variant__: "SM",
+  links: { data: { key: string, value: { "__variant__": "UnorderedLink", "url": string } }[] }
+}
 
 async function getServerState() {
   const network = Network.DEVNET;
@@ -17,68 +19,62 @@ async function getServerState() {
 }
 
 export async function generateStaticParams() {
-  // TODO: This means pages have to generated ahead of time, rather than on-demand.  They should be on-demand.
-  const userAddress = "0x0345c5ca835f8d967f72827e42aade056947eb211ca5d483ea80791631149319";
-  
-  // Return both mock profiles and the module address path
-  return [
-    {
-      name: userAddress,
-    }
-  ];
+  return [];
 }
 
-export default async function ProfilePage({
-  params
-}: {
-  params: { name: string }
-}) {
+interface PageProps {
+  params: { name: string };
+}
+
+export default async function ProfilePage(props: PageProps) {
+  const { params } = await props;
+
   const state = await getServerState();
-  
+
   // Server-side data fetching
-  const address = await state.mainnetClient.ans.getTargetAddress({name: params.name})
+  const address = await state.mainnetClient.ans.getTargetAddress({ name: params.name })
     .catch(() => undefined);
 
-  const bio = address ? await state.client.view<[{vec:[ImageBio | NFTBio]}]>({
+  const bio = address ? await state.client.view<[{ vec: [ImageBio | NFTBio] }]>({
     payload: {
       function: `${CONTRACT_ADDRESS}::profile::view_bio`,
-      functionArguments: [address]
-    }
+      functionArguments: [address],
+    },
   }).then(([data]) => {
     const bio = data.vec[0];
     // TODO: Lookup avatar_url for NFT
     if (bio.__variant__ === "Image") {
       return {
         name: bio.name,
-      bio: bio.bio,
-      avatar_url: bio.avatar_url ?? "NFT Image",
-      }
+        bio: bio.bio,
+        avatar_url: bio.avatar_url ?? "NFT Image",
+      };
     } else {
       return {
         name: bio.name,
         bio: bio.bio,
-        avatar_url:  "NFT Image",
-      }
+        avatar_url: "NFT Image",
+      };
     }
   }).catch(() => undefined) : undefined;
 
   const links = address ? await state.client.view<[LinkTree]>({
     payload: {
       function: `${CONTRACT_ADDRESS}::profile::view_links`,
-      functionArguments: [address]
-    }
+      functionArguments: [address],
+    },
   }).then(([data]) => {
     const inner = data?.links?.data?.map((link) => ({
       id: link.key,
       title: link.key,
-      url: link.value.url
+      url: link.value.url,
     })) ?? [];
 
-    return inner 
-}).catch(() => undefined) : undefined;
+    return inner;
+  }).catch(() => undefined) : undefined;
 
   // Add .apt suffix if it's missing
-  const ansName = params.name.endsWith('.apt') ? params.name : `${params.name}.apt`;
+  const ansName = params.name.endsWith(".apt") ? params.name : `${params.name}.apt`;
 
   // Create a profile using the URL parameter as the ANS name
   const profile = {
@@ -89,7 +85,7 @@ export default async function ProfilePage({
     description: bio?.bio ?? "",
     title: bio?.name ?? "",
     links: links ?? [],
-  }
+  };
 
   if (!profile) {
     return (
@@ -98,6 +94,6 @@ export default async function ProfilePage({
       </div>
     );
   }
-  
+
   return <ProfileClient profile={profile} />;
-} 
+}

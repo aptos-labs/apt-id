@@ -6,9 +6,7 @@ import { TopBar } from "../components/TopBar";
 import { useAptosName } from "../hooks/useAptosName";
 import { ProfileEditor } from "../components/ProfileEditor";
 import { useEffect, useState } from "react";
-import { Profile } from "../types";
-
-const CONTRACT_ADDRESS = "0xb11affd5c514bb969e988710ef57813d9556cc1e3fe6dc9aa6a82b56aee53d98";
+import { Profile } from "@/types";
 
 export default function Home() {
   const { connected, account } = useWallet();
@@ -66,7 +64,7 @@ export default function Home() {
     };
 
     if (connected && account?.address) {
-      fetchProfile();
+      fetchProfile().then(() => {});
     } else {
       setLoading(false);
     }
