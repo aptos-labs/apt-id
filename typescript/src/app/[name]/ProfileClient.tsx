@@ -75,7 +75,7 @@ export default function ProfileClient({ profile: initialProfile }: { profile: Pr
     };
 
     fetchLatestProfile();
-  }, [profile.owner]);
+  }, [profile.owner, profile]);
 
   if (loading) {
     return (
