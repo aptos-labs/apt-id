@@ -1,6 +1,6 @@
 import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 import ProfileClient from "./ProfileClient";
-import { CONTRACT_ADDRESS } from "@/constants.ts";
+import { CONTRACT_ADDRESS, NETWORK } from "@/constants.ts";
 import { redirect } from 'next/navigation';
 import NotFound from "@/app/not-found.tsx";
 
@@ -12,9 +12,8 @@ type LinkTree = {
 };
 
 async function getServerState() {
-  const network = Network.DEVNET;
+  const network = NETWORK;
   return {
-    mainnetClient: new Aptos(new AptosConfig({ network: Network.MAINNET })),
     client: new Aptos(new AptosConfig({ network })),
     network,
   };
@@ -45,7 +44,7 @@ export default async function ProfilePage(props: PageProps) {
   const lookupName = `${params.name}.apt`;
   
   // Server-side data fetching
-  const address = await state.mainnetClient.ans.getTargetAddress({ name: lookupName })
+  const address = await state.client.ans.getTargetAddress({ name: lookupName })
     .catch(() => undefined);
 
   const bio = address
