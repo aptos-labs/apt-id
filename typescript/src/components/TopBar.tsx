@@ -11,7 +11,7 @@ export function TopBar() {
           href="/" 
           className="text-white font-semibold hover:text-white/80 transition-colors"
         >
-          Aptos Profile
+          Apt Id
         </Link>
         <WalletSelector />
       </div>
