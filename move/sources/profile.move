@@ -1,4 +1,6 @@
-/// Aptos Profile
+/// AptId profile
+///
+/// Provides a LinkTree and a image and bio, sharable across multiple platforms
 module profile_address::profile {
 
     use std::option::{Self, Option};
@@ -6,6 +8,7 @@ module profile_address::profile {
     use std::string::String;
     use aptos_std::simple_map::{Self, SimpleMap};
     use aptos_framework::object::{Self, DeleteRef, ExtendRef, Object};
+    use aptos_token_objects::token;
     use aptos_token_objects::token::Token;
 
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
@@ -272,6 +275,20 @@ module profile_address::profile {
     #[view]
     public fun profile_exists(owner: address): bool {
         exists<ProfileRef>(owner)
+    }
+
+    #[view]
+    public fun image_url(owner: address): Option<String> acquires ProfileRef, Bio {
+        view_bio(owner).map(|bio| {
+            match (bio) {
+                Bio::Image { avatar_url, .. } => {
+                    avatar_url
+                }
+                Bio::NFT { avatar_nft, .. } => {
+                    token::uri(avatar_nft)
+                }
+            }
+        })
     }
 
     #[view]
