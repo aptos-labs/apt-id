@@ -31,7 +31,7 @@ interface PageProps {
 export default async function ProfilePage(props: PageProps) {
   const params = await props.params;
   if (!params?.name) {
-    return <NotFound />;
+    return <NotFound aptName={params.name} />;
   }
 
   // Redirect .apt URLs to base name
@@ -110,9 +110,7 @@ export default async function ProfilePage(props: PageProps) {
 
   if (!profile.owner) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#D8B4FE] to-[#818CF8] flex items-center justify-center">
-        <div className="text-xl text-white">Profile not found</div>
-      </div>
+      <NotFound aptName={params.name}/>
     );
   }
 
