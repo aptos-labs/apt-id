@@ -1,6 +1,5 @@
-import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 import { NextRequest, NextResponse } from "next/server";
-import { CONTRACT_ADDRESS } from "@/constants.ts";
+import { client, CONTRACT_ADDRESS } from "@/constants.ts";
 
 type LinkTree = {
   __variant__: "SM";
@@ -24,8 +23,6 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const client = new Aptos(new AptosConfig({ network: Network.DEVNET }));
-
     const links = await client
       .view<[LinkTree]>({
         payload: {

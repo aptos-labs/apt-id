@@ -1,6 +1,5 @@
-import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 import { NextRequest, NextResponse } from "next/server";
-import { CONTRACT_ADDRESS } from "@/constants.ts";
+import { client, CONTRACT_ADDRESS } from "@/constants.ts";
 
 type ImageBio = { __variant__: "Image"; avatar_url: string; bio: string; name: string };
 type NFTBio = { __variant__: "NFT"; nft_url: { inner: string }; bio: string; name: string };
@@ -14,8 +13,6 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const client = new Aptos(new AptosConfig({ network: Network.DEVNET }));
-
     const bio = await client
       .view<[{ vec: [ImageBio | NFTBio] }]>({
         payload: {

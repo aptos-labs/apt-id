@@ -130,7 +130,7 @@ export function ProfileEditor({ profile, onViewProfile, loading = false }: Profi
         {/* Profile Picture */}
         <div className="relative w-[96px] h-[96px] mb-4 sm:w-[120px] sm:h-[120px] group">
           <Image
-            src={avatar || '/default-avatar.png'}
+            src={avatar || '/favicon.ico'}
             alt="Profile picture"
             width={120}
             height={120}

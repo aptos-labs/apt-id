@@ -1,6 +1,5 @@
-import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 import ProfileClient from "./ProfileClient";
-import { CONTRACT_ADDRESS, NETWORK } from "@/constants.ts";
+import { client, CONTRACT_ADDRESS } from "@/constants.ts";
 import { redirect } from 'next/navigation';
 import NotFound from "@/app/not-found.tsx";
 
@@ -10,14 +9,6 @@ type LinkTree = {
   __variant__: "SM";
   links: { data: { key: string; value: { __variant__: "UnorderedLink"; url: string } }[] };
 };
-
-async function getServerState() {
-  const network = NETWORK;
-  return {
-    client: new Aptos(new AptosConfig({ network })),
-    network,
-  };
-}
 
 export async function generateStaticParams() {
   return [];
@@ -38,17 +29,15 @@ export default async function ProfilePage(props: PageProps) {
     redirect(`/${params.name.slice(0, -4)}`);
   }
 
-  const state = await getServerState();
-
   // Always add .apt for ANS lookup
   const lookupName = `${params.name}.apt`;
   
   // Server-side data fetching
-  const address = await state.client.ans.getTargetAddress({ name: lookupName })
+  const address = await client.ans.getTargetAddress({ name: lookupName })
     .catch(() => undefined);
 
   const bio = address
-    ? await state.client
+    ? await client
         .view<[{ vec: [ImageBio | NFTBio] }]>({
           payload: {
             function: `${CONTRACT_ADDRESS}::profile::view_bio`,
@@ -76,7 +65,7 @@ export default async function ProfilePage(props: PageProps) {
     : undefined;
 
   const links = address
-    ? await state.client
+    ? await client
         .view<[LinkTree]>({
           payload: {
             function: `${CONTRACT_ADDRESS}::profile::view_links`,
