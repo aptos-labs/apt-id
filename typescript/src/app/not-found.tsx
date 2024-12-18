@@ -1,13 +1,13 @@
 import Link from 'next/link';
 import { TopBar } from '../components/TopBar';
 
-export default function NotFound() {
+export default function NotFound(props: {aptName: string}) {
   return (
     <>
       <TopBar />
       <main className="min-h-screen bg-gradient-to-b from-[#D8B4FE] to-[#818CF8] flex items-center justify-center pt-16">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Profile Not Found</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">Profile {props.aptName} Not Found</h2>
           <p className="text-white/80 mb-8">Could not find the requested profile.</p>
           <Link 
             href="/"

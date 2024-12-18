@@ -4,8 +4,8 @@ import "./globals.css";
 import React from "react";
 
 export const metadata: Metadata = {
-  title: "Aptos Profile",
-  description: "Your Aptos Profile Links",
+  title: "AptId",
+  description: "Your Profile into Aptos Identity",
 };
 
 export default function RootLayout({
