@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react';
 import PublicProfile from '../../components/PublicProfile';
 import { Profile } from '@/types';
-import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
-import { CONTRACT_ADDRESS } from "@/constants.ts";
+import { client, CONTRACT_ADDRESS } from "@/constants.ts";
 
 type ImageBio = { __variant__: "Image"; avatar_url: string; bio: string; name: string };
 type NFTBio = { __variant__: "NFT"; nft_url: { inner: string }; bio: string; name: string };
@@ -28,8 +27,6 @@ export default function ProfileClient({ profile: initialProfile }: { profile: Pr
   useEffect(() => {
     const fetchLatestProfile = async () => {
       try {
-        const client = new Aptos(new AptosConfig({ network: Network.DEVNET }));
-        
         // Fetch latest bio
         const bioResult = await client.view<[{ vec: [ImageBio | NFTBio] }]>({
           payload: {

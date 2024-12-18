@@ -32,7 +32,7 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
             {/* Profile Picture */}
             <div className="relative w-[96px] h-[96px] mb-4 sm:w-[120px] sm:h-[120px]">
               <Image
-                src={profile.profilePicture || '/default-avatar.png'}
+                src={profile.profilePicture || '/favicon.ico'}
                 alt={`${username}'s profile picture`}
                 width={120}
                 height={120}
@@ -92,13 +92,13 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
           {/* Footer */}
           <footer className="text-center mt-auto">
             <a
-              href="https://aptoslabs.com"
+              href="https://aptid.xyz"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center text-[14px] sm:text-[16px] text-white/80 
                        hover:text-white transition-colors duration-200"
             >
-              Made with Aptos Profile
+              Made with Aptos Id
             </a>
           </footer>
         </div>

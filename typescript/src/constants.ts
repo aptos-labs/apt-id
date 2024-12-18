@@ -1,5 +1,12 @@
-import type { Network } from "@aptos-labs/wallet-adapter-react";
+import { Aptos, AptosConfig, Network as SdkNetwork } from "@aptos-labs/ts-sdk";
 
-export const NETWORK: Network = (process.env.NEXT_PUBLIC_APP_NETWORK as Network) ?? "testnet";
+export const NETWORK = "mainnet";
+export const CONTRACT_ADDRESS = "0x631f344549b798ad70cb5ab1842565b082fdfe488b7c6d56a257220222f6a191";
+
 export const APTOS_API_KEY = process.env.NEXT_PUBLIC_APTOS_API_KEY;
-export const CONTRACT_ADDRESS = "0xb11affd5c514bb969e988710ef57813d9556cc1e3fe6dc9aa6a82b56aee53d98";
+export const client = new Aptos(
+  new AptosConfig({
+    network: SdkNetwork.MAINNET,
+    clientConfig: { API_KEY: APTOS_API_KEY },
+  }),
+);
