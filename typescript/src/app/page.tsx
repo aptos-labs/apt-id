@@ -103,7 +103,7 @@ export default function Home() {
       <div className="flex flex-col gap-6">
         <h1 className="text-3xl font-bold text-white text-center">Edit Your Profile</h1>
         <ProfileEditor profile={profile || undefined} onViewProfile={handleViewProfile}
-                       loading={loading || ansLoading} />;
+                       loading={loading || ansLoading} />
       </div>
     );
   };
