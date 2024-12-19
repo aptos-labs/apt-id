@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import * as Popover from '@radix-ui/react-popover';
 import * as Dialog from '@radix-ui/react-dialog';
+import * as Tooltip from '@radix-ui/react-tooltip';
+import { ShareIcon, Share2Icon } from "lucide-react";
 
 interface PublicProfileProps {
   profile: Profile;
@@ -13,6 +15,7 @@ interface PublicProfileProps {
 
 export default function PublicProfile({ profile }: PublicProfileProps) {
   const [copied, setCopied] = useState(false);
+  const [shareText, setShareText] = useState("Share profile");
   const { account } = useWallet();
   const router = useRouter();
   // Extract the username from ANS name (remove .apt)
@@ -29,8 +32,32 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
     try {
       await navigator.clipboard.writeText(link);
       setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy link: ', err);
+    }
+  };
+
+  const handleShare = async () => {
+    const shareUrl = window.location.href;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${username}'s Apt ID Profile`,
+          url: shareUrl,
+        });
+      } catch (err) {
+        console.log('Error sharing:', err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setShareText("Copied!");
+        setTimeout(() => setShareText("Share profile"), 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
     }
   };
 
@@ -55,10 +82,11 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
                 </button>
               </Dialog.Trigger>
               <Dialog.Portal>
-                <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
-                <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[90vw] max-h-[90vh]">
-                  <div className="relative">
-                    <Image
+               <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
+                <Dialog.Title>PFP</Dialog.Title>
+                  <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[90vw] max-h-[90vh]">
+                    <div className="relative">
+                      <Image
                       src={profile.profilePicture || "/favicon.ico"}
                       alt={`${username}'s profile picture`}
                       width={500}
@@ -93,7 +121,61 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
 
             {/* Profile Info */}
             <div className="text-center w-full max-w-[400px] mx-auto">
-              <h1 className="text-[20px] sm:text-[24px] font-semibold text-white mb-2">{username} {}</h1>
+              <h1 className="text-[20px] sm:text-[24px] font-semibold text-white mb-2">
+                {username}
+              </h1>
+              <div className="flex items-center justify-center gap-4 mb-4">
+                <Tooltip.Provider>
+                  <Tooltip.Root>
+                    <Tooltip.Trigger asChild>
+                      <a
+                        href={`https://explorer.aptoslabs.com/account/${profile.owner}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center text-white/70 hover:text-white"
+                      >
+                        <Image
+                          src="/favicon.ico"
+                          alt="View in Explorer"
+                          width={16}
+                          height={16}
+                        />
+                      </a>
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content
+                        className="rounded-md bg-white px-3 py-2 text-sm text-gray-700 shadow-md"
+                        sideOffset={5}
+                      >
+                        View in Explorer
+                        <Tooltip.Arrow className="fill-white" />
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                </Tooltip.Provider>
+
+                <Tooltip.Provider>
+                  <Tooltip.Root>
+                    <Tooltip.Trigger asChild>
+                      <button
+                        onClick={handleShare}
+                        className="inline-flex items-center text-white/70 hover:text-white"
+                      >
+                        <Share2Icon className="w-4 h-4" />
+                      </button>
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content
+                        className="rounded-md bg-white px-3 py-2 text-sm text-gray-700 shadow-md"
+                        sideOffset={5}
+                      >
+                        {shareText}
+                        <Tooltip.Arrow className="fill-white" />
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                </Tooltip.Provider>
+              </div>
               <p className="text-[16px] sm:text-[18px] text-white/80 mb-8">{profile.description}</p>
             </div>
           </header>
@@ -144,6 +226,7 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
                         onClick={() => handleCopy(link.url)}
                         className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md w-full"
                       >
+                        <ShareIcon className="w-4 h-4" />
                         {copied ? 'Copied!' : 'Copy link'}
                       </button>
                       <Popover.Arrow className="fill-white" />
