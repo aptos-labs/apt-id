@@ -1,18 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { client, CONTRACT_ADDRESS } from "@/constants.ts";
-
-type LinkTree = {
-  __variant__: "SM";
-  links: {
-    data: {
-      key: string;
-      value: {
-        __variant__: "UnorderedLink";
-        url: string;
-      };
-    }[];
-  };
-};
+import { getLinks } from "@/app/api/util.ts";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -23,23 +10,11 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const links = await client
-      .view<[LinkTree]>({
-        payload: {
-          function: `${CONTRACT_ADDRESS}::profile::view_links`,
-          functionArguments: [address],
-        },
-      })
-      .then(([data]) => {
-        const links =
-          data?.links?.data?.map((link) => ({
-            id: link.key,
-            title: link.key,
-            url: link.value.url,
-          })) ?? [];
+    const links = await getLinks(address);
 
-        return links;
-      });
+    if (!links) {
+      return NextResponse.json({ error: "No profile found" }, { status: 404 });
+    }
 
     return NextResponse.json(links);
   } catch (error) {
