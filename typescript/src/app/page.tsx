@@ -7,6 +7,7 @@ import { useAptosName } from "../hooks/useAptosName";
 import { ProfileEditor } from "../components/ProfileEditor";
 import { useEffect, useState } from "react";
 import { Profile } from "@/types";
+import { fetchBioAndLinks } from "@/app/api/util.ts";
 
 export default function Home() {
   const { connected, account } = useWallet();
@@ -23,20 +24,10 @@ export default function Home() {
       }
 
       try {
-        console.log('Fetching profile for address:', account.address.toString());
-        
-        // Fetch bio
-        const bioResponse = await fetch(`/api/profile/bio?address=${account.address}`);
-        const bio = await bioResponse.json();
-        console.log('Fetched bio:', bio);
+        const [bio, links] = await fetchBioAndLinks(account.address);
 
-        // Fetch links
-        const linksResponse = await fetch(`/api/profile/links?address=${account.address}`);
-        const links = await linksResponse.json();
-        console.log('Fetched links:', links);
-
-        if (bio?.error) {
-          console.log('Bio fetch error:', bio.error);
+        if (bio?.error || !bio) {
+          console.log("Bio fetch error:", bio.error);
           setProfile(null);
           setLoading(false);
           return;
@@ -46,14 +37,13 @@ export default function Home() {
         const profileData: Profile = {
           owner: account.address.toString(),
           ansName: ansName || account.address.toString(),
-          name: bio?.name || "",
-          profilePicture: bio?.avatar_url || "",
-          description: bio?.bio || "",
-          title: bio?.name || "",
-          links: Array.isArray(links) ? links : []
+          name: bio.name || "",
+          profilePicture: bio.avatar_url || "",
+          description: bio.bio || "",
+          title: bio.name || "",
+          links: Array.isArray(links) ? links : [],
         };
 
-        console.log('Setting profile data:', profileData);
         setProfile(profileData);
       } catch (error) {
         console.error("Error fetching profile:", error);
@@ -62,13 +52,12 @@ export default function Home() {
         setLoading(false);
       }
     };
-
-    if (connected && account?.address) {
+    if (connected && account?.address && loading) {
       fetchProfile().then(() => {});
     } else {
       setLoading(false);
     }
-  }, [connected, account?.address, ansName]);
+  }, [connected, account?.address, ansName, loading]);
 
   const handleViewProfile = async () => {
     if (connected) {
@@ -92,9 +81,7 @@ export default function Home() {
             <div className="flex flex-col items-center gap-6">
               <h1 className="text-3xl font-bold text-white">Apt Id</h1>
               <div className="flex flex-col items-center gap-4">
-                <p className="text-white/80 text-center">
-                  Connect your wallet to create your profile
-                </p>
+                <p className="text-white/80 text-center">Connect your wallet to create your profile</p>
               </div>
             </div>
           ) : (
@@ -103,11 +90,7 @@ export default function Home() {
               {loading ? (
                 <div className="text-white text-center">Loading profile...</div>
               ) : (
-                <ProfileEditor 
-                  profile={profile || undefined} 
-                  onViewProfile={handleViewProfile} 
-                  loading={ansLoading} 
-                />
+                <ProfileEditor profile={profile || undefined} onViewProfile={handleViewProfile} loading={ansLoading} />
               )}
             </div>
           )}
@@ -116,4 +99,3 @@ export default function Home() {
     </>
   );
 }
-
