@@ -1,41 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { client, CONTRACT_ADDRESS } from "@/constants.ts";
-
-type ImageBio = { __variant__: "Image"; avatar_url: string; bio: string; name: string };
-type NFTBio = { __variant__: "NFT"; nft_url: { inner: string }; bio: string; name: string };
+import { getBio } from "@/app/api/util.ts";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const address = searchParams.get("address");
 
+  // TODO: add caching
+
   if (!address) {
     return NextResponse.json({ error: "Address is required" }, { status: 400 });
   }
-
   try {
-    const bio = await client
-      .view<[{ vec: [ImageBio | NFTBio] }]>({
-        payload: {
-          function: `${CONTRACT_ADDRESS}::profile::view_bio`,
-          functionArguments: [address],
-        },
-      })
-      .then(([data]) => {
-        const bio = data.vec[0];
-        if (bio.__variant__ === "Image") {
-          return {
-            name: bio.name,
-            bio: bio.bio,
-            avatar_url: bio.avatar_url,
-          };
-        } else {
-          return {
-            name: bio.name,
-            bio: bio.bio,
-            avatar_url: bio.nft_url.inner,
-          };
-        }
-      });
+    const bio = await getBio(address);
+
+    if (!bio) {
+      return NextResponse.json({ error: "No profile found" }, { status: 404 });
+    }
 
     return NextResponse.json(bio);
   } catch (error) {

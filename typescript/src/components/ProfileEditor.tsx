@@ -73,7 +73,7 @@ export function ProfileEditor({ profile, onViewProfile, loading = false }: Profi
             function: `${CONTRACT_ADDRESS}::profile::create`,
             typeArguments: [],
             functionArguments: [
-              bio,                  // name: String
+              profile?.ansName,     // name: String
               bio,                  // bio: String
               avatar,               // avatar_url: Option<String>
               undefined,            // avatar_nft: Option<Object<Token>> - always empty for now
@@ -89,7 +89,7 @@ export function ProfileEditor({ profile, onViewProfile, loading = false }: Profi
             function: `${CONTRACT_ADDRESS}::profile::set_bio`,
             typeArguments: [],
             functionArguments: [
-              bio,                  // name: String
+              profile?.ansName,     // name: String
               bio,                  // bio: String
               avatar,               // avatar_url: Option<String>
               undefined             // avatar_nft: Option<Object<Token>> - always empty for now
