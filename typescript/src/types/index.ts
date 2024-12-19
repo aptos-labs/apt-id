@@ -6,7 +6,7 @@ export interface Link {
 
 export interface Profile {
   owner: string;
-  ansName: string;
+  ansName: string | null;
   name: string;
   profilePicture: string;
   description: string;
