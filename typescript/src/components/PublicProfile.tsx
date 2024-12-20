@@ -273,7 +273,7 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
                     <span className="flex justify-start">
                       {getLinkIcon(link.url)}
                     </span>
-                    <span className="text-center">
+                    <span className="text-center -ml-6">
                       {link.title}
                     </span>
                   </div>
