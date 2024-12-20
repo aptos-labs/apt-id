@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Profile } from '@/types';
 import { TopBar } from "./TopBar";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
@@ -94,6 +94,51 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
     return <ExternalLinkIcon className="w-4 h-4" />;
   };
 
+  
+
+  const [resolvedImageUrl, setResolvedImageUrl] = useState("/favicon.ico");
+
+  useEffect(() => {
+    const resolveIpfsUrl = async (url: string) => {
+      if (!url) return "/favicon.ico";
+      
+      // Handle IPFS URLs
+      if (url.startsWith('ipfs://')) {
+        const ipfsUrl = url.replace('ipfs://', 'https://ipfs.io/ipfs/');
+        
+        try {
+          // Try to fetch and parse as JSON first
+          const response = await fetch(ipfsUrl);
+          const contentType = response.headers.get('content-type');
+          
+          if (contentType?.includes('application/json')) {
+            const data = await response.json();
+            // Check if there's an image property in the JSON
+            if (data.image) {
+              // Recursively resolve the image URL in case it's also an IPFS URL
+              return resolveIpfsUrl(data.image);
+            }
+          }
+          
+          // If not JSON or no image property, return the direct IPFS URL
+          return ipfsUrl;
+        } catch (err) {
+          console.error('Error resolving IPFS URL:', err);
+          return ipfsUrl;
+        }
+      }
+      
+      return url;
+    };
+    
+    resolveIpfsUrl(profile.profilePicture)
+      .then(setResolvedImageUrl)
+      .catch(err => {
+        console.error('Error resolving profile picture URL:', err);
+        setResolvedImageUrl("/favicon.ico");
+      });
+  }, [profile.profilePicture]);
+
   return (
     <>
       <TopBar />
@@ -106,7 +151,7 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
               <Dialog.Trigger asChild>
                 <button className="relative w-[96px] h-[96px] mb-4 sm:w-[120px] sm:h-[120px] rounded-full overflow-hidden hover:opacity-90 transition-opacity">
                   <Image
-                    src={profile.profilePicture || "/favicon.ico"}
+                    src={resolvedImageUrl}
                     alt={`${username}'s profile picture`}
                     width={120}
                     height={120}
@@ -120,34 +165,34 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
                   <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[90vw] max-h-[90vh]">
                     <div className="relative">
                       <Image
-                      src={profile.profilePicture || "/favicon.ico"}
-                      alt={`${username}'s profile picture`}
-                      width={500}
-                      height={500}
-                      className="rounded-lg object-contain max-h-[90vh]"
-                    />
-                    <Dialog.Close asChild>
-                      <button
-                        className="absolute top-2 right-2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
-                        aria-label="Close"
-                      >
-                        <svg
-                          width="15"
-                          height="15"
-                          viewBox="0 0 15 15"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
+                        src={resolvedImageUrl}
+                        alt={`${username}'s profile picture`}
+                        width={500}
+                        height={500}
+                        className="rounded-lg object-contain max-h-[90vh]"
+                      />
+                      <Dialog.Close asChild>
+                        <button
+                          className="absolute top-2 right-2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                          aria-label="Close"
                         >
-                          <path
-                            d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03157 3.2184C3.80702 2.99385 3.44295 2.99385 3.2184 3.2184C2.99385 3.44295 2.99385 3.80702 3.2184 4.03157L6.68682 7.50005L3.2184 10.9685C2.99385 11.193 2.99385 11.5571 3.2184 11.7816C3.44295 12.0062 3.80702 12.0062 4.03157 11.7816L7.50005 8.31328L10.9685 11.7816C11.193 12.0062 11.5571 12.0062 11.7816 11.7816C12.0062 11.5571 12.0062 11.193 11.7816 10.9685L8.31328 7.50005L11.7816 4.03157Z"
-                            fill="currentColor"
-                            fillRule="evenodd"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
-                    </Dialog.Close>
-                  </div>
+                          <svg
+                            width="15"
+                            height="15"
+                            viewBox="0 0 15 15"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03157 3.2184C3.80702 2.99385 3.44295 2.99385 3.2184 3.2184C2.99385 3.44295 2.99385 3.80702 3.2184 4.03157L6.68682 7.50005L3.2184 10.9685C2.99385 11.193 2.99385 11.5571 3.2184 11.7816C3.44295 12.0062 3.80702 12.0062 4.03157 11.7816L7.50005 8.31328L10.9685 11.7816C11.193 12.0062 11.5571 12.0062 11.7816 11.7816C12.0062 11.5571 12.0062 11.193 11.7816 10.9685L8.31328 7.50005L11.7816 4.03157Z"
+                              fill="currentColor"
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      </Dialog.Close>
+                    </div>
                 </Dialog.Content>
               </Dialog.Portal>
             </Dialog.Root>
