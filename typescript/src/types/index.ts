@@ -1,4 +1,4 @@
-export interface Link {
+export interface ProfileLink {
   id: string;
   title: string;
   url: string;
@@ -11,5 +11,5 @@ export interface Profile {
   profilePicture: string;
   description: string;
   title: string;
-  links: Link[];
+  links: ProfileLink[];
 }
