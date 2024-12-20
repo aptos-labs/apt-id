@@ -11,7 +11,7 @@ type Props = {
   }>;
 };
 
-export const revalidate = 60; // Revalidate every 60 seconds (1 minute)
+export const revalidate = 0; // Disable caching so we can use the latest data
 
 export async function generateMetadata({ params }: Props, parent: ResolvingMetadata) {
   // Resolve name
