@@ -9,6 +9,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { TwitterIcon, GithubIcon, FacebookIcon, InstagramIcon, LinkedinIcon } from "lucide-react";
 import { DiscordLogoIcon, PaperPlaneIcon, ExternalLinkIcon, Share1Icon, CopyIcon } from "@radix-ui/react-icons";
+import Link from "next/link";
 
 interface PublicProfileProps {
   profile: Profile;
@@ -206,7 +207,7 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
                 <Tooltip.Provider>
                   <Tooltip.Root>
                     <Tooltip.Trigger asChild>
-                      <a
+                      <Link
                         href={`https://explorer.aptoslabs.com/account/${profile.owner}`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -218,7 +219,7 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
                           width={16}
                           height={16}
                         />
-                      </a>
+                      </Link>
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
                       <Tooltip.Content
@@ -262,7 +263,7 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
           <section className="space-y-3 mb-8 w-full max-w-[500px] mx-auto">
             {profile.links.map((link) => (
               <div key={link.id} className="relative group flex items-center gap-2">
-                <a href={link.url} target="_blank" rel="noopener noreferrer" className="block w-full">
+                <Link href={link.url} target="_blank" rel="noopener noreferrer" className="block w-full">
                   <div
                     className="px-4 py-[14px] sm:py-4 text-[14px] sm:text-[16px] font-semibold
                               text-center bg-white/90 group-hover:bg-white 
@@ -277,7 +278,7 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
                       {link.title}
                     </span>
                   </div>
-                </a>
+                </Link>
                 <Popover.Root>
                   <Popover.Trigger asChild>
                     <button
@@ -352,7 +353,7 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
 
           {/* Footer */}
           <footer className="text-center mt-auto">
-            <a
+            <Link
               href="https://aptid.xyz"
               target="_blank"
               rel="noopener noreferrer"
@@ -360,7 +361,7 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
                        hover:text-white transition-colors duration-200"
             >
               Made with Apt ID
-            </a>
+            </Link>
           </footer>
         </div>
       </main>
