@@ -4,7 +4,7 @@ import "./globals.css";
 import React from "react";
 
 export const metadata: Metadata = {
-  title: "Apt Id",
+  title: "Apt ID",
   description: "Your Profile into Aptos Identity",
 };
 
