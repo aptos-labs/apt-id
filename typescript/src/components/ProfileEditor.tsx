@@ -8,12 +8,13 @@ import {CONTRACT_ADDRESS} from "@/constants.ts";
 import Image from "next/image"; // Add LinkIcon
 
 interface ProfileEditorProps {
+  ansName: string;
   profile?: Profile;
   onViewProfile?: () => void;
   loading?: boolean;
 }
 
-export function ProfileEditor({ profile, onViewProfile, loading = false }: ProfileEditorProps) {
+export function ProfileEditor({ ansName, profile, onViewProfile, loading = false }: ProfileEditorProps) {
   const { account, signAndSubmitTransaction } = useWallet();
   const [bio, setBio] = useState<string>('');
   const [avatar, setAvatar] = useState<string>('');
@@ -73,7 +74,7 @@ export function ProfileEditor({ profile, onViewProfile, loading = false }: Profi
             function: `${CONTRACT_ADDRESS}::profile::create`,
             typeArguments: [],
             functionArguments: [
-              profile?.ansName,     // name: String
+              ansName,              // name: String
               bio,                  // bio: String
               avatar,               // avatar_url: Option<String>
               undefined,            // avatar_nft: Option<Object<Token>> - always empty for now
@@ -89,7 +90,7 @@ export function ProfileEditor({ profile, onViewProfile, loading = false }: Profi
             function: `${CONTRACT_ADDRESS}::profile::set_bio`,
             typeArguments: [],
             functionArguments: [
-              profile?.ansName,     // name: String
+              ansName,     // name: String
               bio,                  // bio: String
               avatar,               // avatar_url: Option<String>
               undefined             // avatar_nft: Option<Object<Token>> - always empty for now
