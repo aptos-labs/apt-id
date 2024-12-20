@@ -314,7 +314,7 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
               className="inline-flex items-center text-[14px] sm:text-[16px] text-white/80 
                        hover:text-white transition-colors duration-200"
             >
-              Made with Apt Id
+              Made with Apt ID
             </a>
           </footer>
         </div>
