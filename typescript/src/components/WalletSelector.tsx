@@ -72,7 +72,6 @@ export function WalletSelector() {
     );
   }
 
-  // TODO: Sort wallets by usage
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
