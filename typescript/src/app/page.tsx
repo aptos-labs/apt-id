@@ -118,7 +118,25 @@ export default function Home() {
         className="min-h-screen bg-gradient-to-b from-[#D8B4FE] to-[#818CF8] flex items-center justify-center pt-16">
         <div className="w-full max-w-[680px] mx-auto px-4">
           {!connected ? (
-            <div className="flex flex-col items-center gap-6">
+            <div className="flex flex-col items-center gap-6 relative">
+              <div className="fixed top-16 right-24 flex items-center text-white">
+                <span className="text-lg mr-2">Connect Here</span>
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="animate-bounce"
+                >
+                  <path
+                    d="M12 5L12 19M12 5L5 12M12 5L19 12"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
               <h1 className="text-3xl font-bold text-white">Apt ID</h1>
               <div className="flex flex-col items-center gap-4">
                 <p className="text-white/80 text-center">Connect your wallet to create your profile</p>
