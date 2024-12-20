@@ -1,18 +1,59 @@
 'use client';
 
-import { WalletSelector } from "./WalletSelector";
-import Link from "next/link";
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { WalletSelector } from './WalletSelector';
+import Image from 'next/image';
+import Link from 'next/link';
+import { SearchIcon } from 'lucide-react';
 
 export function TopBar() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Remove .apt if it's included in the search
+      const cleanQuery = searchQuery.trim().toLowerCase().replace('.apt', '');
+      router.push(`/${cleanQuery}`);
+    }
+  };
+
   return (
-    <div className="fixed top-0 left-0 right-0 bg-white/10 backdrop-blur-md border-b border-white/20">
-      <div className="max-w-[1200px] mx-auto px-4 py-4 flex justify-between items-center">
-        <Link 
-          href="/" 
-          className="text-white font-semibold hover:text-white/80 transition-colors"
-        >
-          Apt Id
+    <div className="fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-sm border-b border-gray-200 z-50">
+      <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2">
+          <Image
+            src="/favicon.ico"
+            alt="Apt ID"
+            width={32}
+            height={32}
+          />
+          <span className="font-semibold text-gray-800">Apt ID</span>
         </Link>
+
+        {/* Search Bar */}
+        <form 
+          onSubmit={handleSearch}
+          className="max-w-md w-full mx-4 relative group"
+        >
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search profiles..."
+              className="w-full px-4 py-2 pl-10 bg-gray-100 border border-transparent
+                       rounded-lg focus:bg-white focus:border-purple-400 focus:outline-none
+                       transition-all duration-200"
+            />
+            <SearchIcon className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+          </div>
+        </form>
+
+        {/* Wallet Selector */}
         <WalletSelector />
       </div>
     </div>
