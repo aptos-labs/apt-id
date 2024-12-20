@@ -1,5 +1,6 @@
 import { AccountAddressInput, parseTypeTag, TypeTagAddress } from "@aptos-labs/ts-sdk";
 import { client, CONTRACT_ADDRESS } from "@/constants.ts";
+import { ProfileLink } from "@/types";
 
 export type ImageBio = { __variant__: "Image"; avatar_url: string; bio: string; name: string };
 export type NFTBio = { __variant__: "NFT"; nft_url: { inner: string }; bio: string; name: string };
@@ -53,19 +54,13 @@ export async function getBio(address: AccountAddressInput): Promise<CombinedBio 
     });
 }
 
-type Link = {
-  id: string;
-  title: string;
-  url: string;
-};
-
 const linksAbi = {
   typeParameters: [],
   parameters: [new TypeTagAddress()],
   returnTypes: [parseTypeTag(`0x1::simple_map::SimpleMap`)],
 };
 
-export async function getLinks(address: AccountAddressInput): Promise<Link[]> {
+export async function getLinks(address: AccountAddressInput): Promise<ProfileLink[]> {
   return client
     .view<[LinkTree]>({
       payload: {

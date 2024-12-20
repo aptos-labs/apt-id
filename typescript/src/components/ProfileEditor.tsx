@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Profile, Link } from '@/types';
+import { Profile, ProfileLink } from '@/types';
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Link as LinkIcon } from 'lucide-react';
 import {CONTRACT_ADDRESS} from "@/constants.ts";
@@ -17,7 +17,7 @@ export function ProfileEditor({ profile, onViewProfile, loading = false }: Profi
   const { account, signAndSubmitTransaction } = useWallet();
   const [bio, setBio] = useState<string>('');
   const [avatar, setAvatar] = useState<string>('');
-  const [links, setLinks] = useState<Link[]>([]);
+  const [links, setLinks] = useState<ProfileLink[]>([]);
   const [saving, setSaving] = useState(false);
   const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
 
@@ -32,7 +32,7 @@ export function ProfileEditor({ profile, onViewProfile, loading = false }: Profi
   }, [profile]);
 
   const handleAddLink = () => {
-    const newLink: Link = {
+    const newLink: ProfileLink = {
       id: Date.now().toString(),
       title: '',
       url: ''
