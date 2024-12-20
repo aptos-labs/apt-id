@@ -9,7 +9,12 @@ import { SearchIcon } from 'lucide-react';
 
 export function TopBar() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<{ name: string; exists: boolean }[]>([]);
+  const [searchResults, setSearchResults] = useState<{ 
+    name: string; 
+    exists: boolean;
+    bio?: string;
+    avatar?: string;
+  }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const router = useRouter();
@@ -26,11 +31,14 @@ export function TopBar() {
         const cleanQuery = searchQuery.trim().toLowerCase().replace('.apt', '');
         const response = await fetch(`/api/profile/name?name=${cleanQuery}`);
         const data = await response.json();
-        const response2 = await fetch(`/api/profile/bio?address=${data}`);
-        if (response2.ok) {
+        const bioResponse = await fetch(`/api/profile/bio?address=${data}`);
+        if (bioResponse.ok) {
+          const bio = await bioResponse.json();
           setSearchResults([{
             name: cleanQuery,
-            exists: response.ok
+            exists: response.ok,
+            bio: bio.bio || '',
+            avatar: bio.avatar_url || '/favicon.ico'
           }]);
         } else {
           setSearchResults([{
@@ -113,7 +121,25 @@ export function TopBar() {
                         }
                       }}
                     >
-                      <span>{result.name}</span>
+                      <div className="flex items-center gap-3">
+                        {result.avatar && (
+                          <Image
+                            src={result.avatar}
+                            alt={result.name}
+                            width={32}
+                            height={32}
+                            className="rounded-full"
+                          />
+                        )}
+                        <div className="flex flex-col">
+                          <span>{result.name}</span>
+                          {result.bio && (
+                            <span className="text-sm text-gray-500 truncate max-w-[300px]">
+                              {result.bio}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                       {result.exists ? (
                         <span className="text-green-500 text-sm">Found</span>
                       ) : (
