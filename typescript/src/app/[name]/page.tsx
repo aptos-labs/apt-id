@@ -11,6 +11,8 @@ type Props = {
   }>;
 };
 
+export const revalidate = 60; // Revalidate every 60 seconds (1 minute)
+
 export async function generateMetadata({ params }: Props, parent: ResolvingMetadata) {
   // Resolve name
   const name = (await params).name;
@@ -69,6 +71,7 @@ export default async function ProfilePage(props: PageProps) {
 
   // Server-side data fetching
   const address = await client.ans.getTargetAddress({ name: lookupName }).catch(() => undefined);
+
   if (!address) {
     return <NotFound aptName={params.name} />;
   }
