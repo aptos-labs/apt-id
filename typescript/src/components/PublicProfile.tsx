@@ -7,7 +7,8 @@ import Image from "next/image";
 import * as Popover from '@radix-ui/react-popover';
 import * as Dialog from '@radix-ui/react-dialog';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { ShareIcon, Share2Icon } from "lucide-react";
+import { TwitterIcon, GithubIcon, FacebookIcon, InstagramIcon, LinkedinIcon } from "lucide-react";
+import { DiscordLogoIcon, PaperPlaneIcon, ExternalLinkIcon, Share1Icon, CopyIcon } from "@radix-ui/react-icons";
 
 interface PublicProfileProps {
   profile: Profile;
@@ -59,6 +60,38 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
         console.error('Failed to copy:', err);
       }
     }
+  };
+
+  const getLinkIcon = (url: string) => {
+    const urlLower = url.toLowerCase();
+    
+    if (urlLower.includes('twitter.com') || urlLower.includes('x.com')) {
+      return <TwitterIcon className="w-4 h-4" />;
+    }
+    if (urlLower.includes('discord.com') || urlLower.includes('discord.gg')) {
+      return <DiscordLogoIcon className="w-4 h-4" />;
+    }
+    if (urlLower.includes('github.com')) {
+      return <GithubIcon className="w-4 h-4" />;
+    }
+    if (urlLower.includes('facebook.com') || urlLower.includes('fb.com')) {
+      return <FacebookIcon className="w-4 h-4" />;
+    }
+    if (urlLower.includes('instagram.com')) {
+      return <InstagramIcon className="w-4 h-4" />;
+    }
+    /*if (urlLower.includes('reddit.com')) {
+      return <RedditIcon className="w-4 h-4" />;
+    }*/
+    if (urlLower.includes('linkedin.com')) {
+      return <LinkedinIcon className="w-4 h-4" />;
+    }
+    if (urlLower.includes('telegram.') || urlLower.includes('t.me')) {
+      return (
+        <PaperPlaneIcon className="w-4 h-4" />
+      );
+    }
+    return <ExternalLinkIcon className="w-4 h-4" />;
   };
 
   return (
@@ -161,7 +194,7 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
                         onClick={handleShare}
                         className="inline-flex items-center text-white/70 hover:text-white"
                       >
-                        <Share2Icon className="w-4 h-4" />
+                        <Share1Icon className="w-4 h-4" />
                       </button>
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
@@ -190,9 +223,14 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
                               text-center bg-white/90 group-hover:bg-white 
                               text-[#000000] rounded-[14px] transition-all 
                               duration-200 backdrop-blur-sm shadow-md
-                              group-hover:scale-[1.02]"
+                              group-hover:scale-[1.02] grid grid-cols-[24px_1fr] items-center"
                   >
-                    {link.title}
+                    <span className="flex justify-start">
+                      {getLinkIcon(link.url)}
+                    </span>
+                    <span className="text-center">
+                      {link.title}
+                    </span>
                   </div>
                 </a>
                 <Popover.Root>
@@ -226,9 +264,23 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
                         onClick={() => handleCopy(link.url)}
                         className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md w-full"
                       >
-                        <ShareIcon className="w-4 h-4" />
+                        <CopyIcon className="w-4 h-4" />
                         {copied ? 'Copied!' : 'Copy link'}
                       </button>
+                      {navigator.share && (
+                        <button
+                          onClick={() => {
+                            navigator.share({
+                              title: link.title,
+                              url: link.url
+                            }).catch(console.error);
+                          }}
+                          className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md w-full"
+                        >
+                          <Share1Icon className="w-4 h-4" />
+                          Share
+                        </button>
+                      )}
                       <Popover.Arrow className="fill-white" />
                     </Popover.Content>
                   </Popover.Portal>
