@@ -24,7 +24,7 @@ export function TopBar() {
     <div className="fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-sm border-b border-gray-200 z-50">
       <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2 relative">
           <Image
             src="/favicon.ico"
             alt="Apt ID"
@@ -32,12 +32,15 @@ export function TopBar() {
             height={32}
           />
           <span className="font-semibold text-gray-800">Apt ID</span>
+          <span className="absolute -top-2 -right-12 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full transform rotate-12 font-bold">
+            BETA
+          </span>
         </Link>
 
         {/* Search Bar */}
         <form 
           onSubmit={handleSearch}
-          className="max-w-md w-full mx-4 relative group"
+          className="max-w-md w-full ml-12 relative group"
         >
           <div className="relative">
             <input
