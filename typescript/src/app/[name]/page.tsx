@@ -27,15 +27,19 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
     if (bio) {
       return {
         title: `${name}'s profile`,
+        description: bio.bio || `Profile page for ${name}`,
         openGraph: {
           images: [bio?.avatar_url, ...previousImages],
+          description: bio.bio || `Profile page for ${name}`,
         },
       };
     }
     return {
       title: `${name}'s profile`,
-      opengraph: {
+      description: `Profile page for ${name}`,
+      openGraph: {
         images: [...previousImages],
+        description: `Profile page for ${name}`,
       },
     };
   }
