@@ -12,12 +12,13 @@ import {
 import { useState } from "react";
 import { useAptosName } from "../hooks/useAptosName";
 import Image from "next/image";
+import { useRouter } from 'next/navigation';
 
 export function WalletSelector() {
   const { wallets, connect, account, connected, disconnect, wallet } = useWallet();
   const { ansName, loading } = useAptosName();
   const [isOpen, setIsOpen] = useState(false);
-
+  const router = useRouter();
   if (connected && account) {
     return (
       <div className="flex flex-col items-center gap-2">
@@ -39,11 +40,21 @@ export function WalletSelector() {
           </div>
         </Button>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogContent>
+          <DialogContent className="max-w-[300px] sm:max-w-[350px]">
             <DialogHeader>
-              <DialogTitle>Wallet Options</DialogTitle>
+              <DialogTitle className="text-center">Wallet Options</DialogTitle>
             </DialogHeader>
             <div className="flex flex-col gap-3">
+              <Button
+                onClick={() => {
+                  router.replace('/');
+                  setIsOpen(false);
+                }}
+                variant="outline"
+                className="w-full"
+              >
+                Go to Editor
+              </Button>
               <Button
                 onClick={() => {
                   disconnect();
