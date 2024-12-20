@@ -34,13 +34,24 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
           images: [bio?.avatar_url, ...previousImages],
           description: bio.bio || `Profile page for ${name}`,
         },
+        twitter: {
+          card: 'summary_large_image',
+          title: `${name}'s profile`,
+          description: bio.bio || `Profile page for ${name}`,
+          images: [bio?.avatar_url],
+        },
       };
     }
     return {
-      title: `${name}'s profile`,
+      title: `${name}'s profile`, 
       description: `Profile page for ${name}`,
       openGraph: {
         images: [...previousImages],
+        description: `Profile page for ${name}`,
+      },
+      twitter: {
+        card: 'summary',
+        title: `${name}'s profile`,
         description: `Profile page for ${name}`,
       },
     };
