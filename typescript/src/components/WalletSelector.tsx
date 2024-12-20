@@ -11,9 +11,10 @@ import {
 } from "./ui/dialog";
 import { useState } from "react";
 import { useAptosName } from "../hooks/useAptosName";
+import Image from "next/image";
 
 export function WalletSelector() {
-  const { wallets, connect, account, connected, disconnect } = useWallet();
+  const { wallets, connect, account, connected, disconnect, wallet } = useWallet();
   const { ansName, loading } = useAptosName();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -26,7 +27,16 @@ export function WalletSelector() {
                    text-center bg-white/90 hover:bg-white text-[#000000] rounded-[14px] 
                    transition-all duration-200 shadow-md hover:scale-[1.02]"
         >
-          {loading ? "Loading..." : ansName || `${account.address.slice(0, 6)}...${account.address.slice(-4)}`}
+          <div className="w-full flex items-center gap-2">
+            <Image 
+              src={wallet?.icon} 
+              alt={`${wallet?.name} logo`}
+              width={24}
+              height={24}
+              className="w-6 h-6"
+            />
+            {loading ? "Loading..." : ansName || `${account.address.slice(0, 6)}...${account.address.slice(-4)}`}
+          </div>
         </Button>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogContent>
@@ -62,9 +72,9 @@ export function WalletSelector() {
           Connect Wallet
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-[300px] sm:max-w-[350px]">
         <DialogHeader>
-          <DialogTitle>Connect Wallet</DialogTitle>
+          <DialogTitle className="text-center">Choose your wallet</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-3">
           {wallets?.filter((wallet) => wallet.name !== "Dev T wallet").map((wallet) => (
@@ -74,14 +84,16 @@ export function WalletSelector() {
                 connect(wallet.name);
                 setIsOpen(false);
               }}
-              className="w-full flex items-center gap-2 relative"
+              className="w-full grid grid-cols-[24px_1fr] items-center gap-2"
             >
-              <img 
+              <Image 
                 src={wallet.icon} 
                 alt={`${wallet.name} logo`}
-                className="w-6 h-6 absolute left-3"
+                width={24}
+                height={24}
+                className="w-6 h-6"
               />
-              <span className="flex-1 text-center">
+              <span className="text-left pl-2">
                 {wallet.name}
               </span>
             </Button>
