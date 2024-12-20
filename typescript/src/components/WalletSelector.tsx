@@ -67,7 +67,6 @@ export function WalletSelector() {
           <DialogTitle>Connect Wallet</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-3">
-          {/* Filter out T wallet */}
           {wallets?.filter((wallet) => wallet.name !== "Dev T wallet").map((wallet) => (
             <Button
               key={wallet.name}
@@ -75,9 +74,16 @@ export function WalletSelector() {
                 connect(wallet.name);
                 setIsOpen(false);
               }}
-              className="w-full"
+              className="w-full flex items-center gap-2 relative"
             >
-              {wallet.name}
+              <img 
+                src={wallet.icon} 
+                alt={`${wallet.name} logo`}
+                className="w-6 h-6 absolute left-3"
+              />
+              <span className="flex-1 text-center">
+                {wallet.name}
+              </span>
             </Button>
           ))}
         </div>
