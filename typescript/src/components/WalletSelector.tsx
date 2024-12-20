@@ -29,7 +29,7 @@ export function WalletSelector() {
         >
           <div className="w-full flex items-center gap-2">
             <Image 
-              src={wallet?.icon} 
+              src={wallet?.icon || '/favicon.ico'} 
               alt={`${wallet?.name} logo`}
               width={24}
               height={24}
