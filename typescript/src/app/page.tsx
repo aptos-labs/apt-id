@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { Profile } from "@/types";
 import { fetchBioAndLinks } from "@/app/api/util.ts";
 import Link from "next/link";
+import { ExternalLinkIcon } from "@radix-ui/react-icons";
 
 export default function Home() {
   const { connected, account } = useWallet();
@@ -93,8 +94,10 @@ export default function Home() {
         <div className="flex flex-col gap-6">
           <h1 className="text-3xl font-bold text-white text-center">Get an Aptos Name</h1>
           <div className="text-white text-center">
-            Profiles can only be created with ANS Names, please grab a Petra name or another name at{" "}
-            <Link href={"https://aptosnames.com"}>Aptos Names</Link>
+            <Link href={"https://aptosnames.com"} target="_blank" className="flex text-center items-center gap-1">
+            Profiles can only be created with ANS Names, go grab one at Aptos Names
+            <ExternalLinkIcon />
+            </Link>
           </div>
         </div>
       );
