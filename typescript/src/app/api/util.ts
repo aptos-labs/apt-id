@@ -71,11 +71,14 @@ export async function getLinks(address: AccountAddressInput): Promise<ProfileLin
     })
     .then(([data]) => {
       return (
-        data?.links?.data?.map((link) => ({
-          id: link.key,
-          title: link.key,
-          url: link.value.url,
-        })) ?? []
+        data?.links?.data?.map((link) => {
+          const title = !link.key ? link.value.url : link.key;
+          return {
+            id: title,
+            title,
+            url: link.value.url,
+          };
+        }) ?? []
       );
     });
 }

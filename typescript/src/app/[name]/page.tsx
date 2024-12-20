@@ -16,8 +16,9 @@ export const revalidate = 0; // Disable caching so we can use the latest data
 export async function generateMetadata({ params }: Props, parent: ResolvingMetadata) {
   // Resolve name
   const name = (await params).name;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://aptid.xyz';
 
-  // Extend rather than replace parent metadata (TODO: Do we want this)
+  // Extend rather than replace parent metadata
   const previousImages = (await parent).openGraph?.images || [];
 
   // Always add .apt for ANS lookup
@@ -27,23 +28,30 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
     const bio = await getBio(address.toString());
 
     if (bio) {
+      const title = `${name}'s Profile | Apt ID`;
+      const description = bio?.bio || `Check out ${name}'s profile on Apt ID`;
+      const imageUrl = bio?.avatar_url || `${baseUrl}/favicon.ico`;
+
       return {
-        title: `${name}'s profile`,
-        description: bio.bio || `Profile page for ${name}`,
+        title,
+        description,
         openGraph: {
-          images: [bio?.avatar_url, ...previousImages],
-          description: bio.bio || `Profile page for ${name}`,
+          images: [imageUrl, ...previousImages],
+          description,
         },
         twitter: {
           card: 'summary_large_image',
-          title: `${name}'s profile`,
-          description: bio.bio || `Profile page for ${name}`,
-          images: [bio?.avatar_url],
+          title,
+          description,
+          images: [{
+            url: imageUrl,
+            alt: `${name}'s profile picture`,
+          }],
         },
       };
     }
     return {
-      title: `${name}'s profile`, 
+      title: `${name}'s profile`,
       description: `Profile page for ${name}`,
       openGraph: {
         images: [...previousImages],
@@ -53,6 +61,7 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
         card: 'summary',
         title: `${name}'s profile`,
         description: `Profile page for ${name}`,
+        images: [`${baseUrl}/favicon.ico`],
       },
     };
   }
