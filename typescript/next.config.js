@@ -19,6 +19,15 @@ const nextConfig = {
           { key: "Access-Control-Allow-Methods", value: "GET" },
         ],
       },
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains; preload'
+          },
+        ],
+      },
     ];
   },
 }

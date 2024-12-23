@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: "Your Profile into Aptos Identity",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
