@@ -7,6 +7,7 @@ module profile_address::profile {
     use std::signer;
     use std::string::String;
     use aptos_std::simple_map::{Self, SimpleMap};
+    use aptos_framework::event::emit;
     use aptos_framework::object::{Self, DeleteRef, ExtendRef, Object};
     use aptos_token_objects::token;
     use aptos_token_objects::token::Token;
@@ -55,6 +56,40 @@ module profile_address::profile {
     /// A ref to ensure we can have a deletable profile, with uniqueness
     struct ProfileRef has key, copy, drop {
         object_address: address
+    }
+
+    #[event]
+    enum BioChangeEvent has drop, store {
+        Image {
+            owner: address,
+            object: address,
+            name: String,
+            bio: String,
+            avatar_url: String,
+        }
+        NFT {
+            owner: address,
+            object: address,
+            name: String,
+            bio: String,
+            avatar_nft: address,
+        }
+    }
+
+    #[event]
+    enum LinkTreeChangeEvent has drop, store {
+        SM {
+            owner: address,
+            object: address,
+        }
+    }
+
+    #[event]
+    enum DeleteProfileEvent has drop, store {
+        V1 {
+            owner: address,
+            object: address,
+        }
     }
 
     /// Profile already exists for user
@@ -107,20 +142,37 @@ module profile_address::profile {
         links: vector<String>
     ) {
         let object_signer = create_object(caller_address);
+        let object_address = signer::address_of(&object_signer);
 
         // If it's an NFT, lock it up for usage, otherwise use an image
         if (avatar_nft.is_some()) {
             let nft = avatar_nft.destroy_some();
+            let nft_address = object::object_address(&nft);
             connect_nft(caller, nft);
             move_to(
                 &object_signer,
                 Bio::NFT { name, bio, avatar_nft: nft }
-            )
+            );
+            emit(BioChangeEvent::NFT {
+                owner: caller_address,
+                object: object_address,
+                name,
+                bio,
+                avatar_nft: nft_address
+            })
         } else if (avatar_url.is_some()) {
+            let avatar_url = avatar_url.destroy_some();
             move_to(
                 &object_signer,
-                Bio::Image { name, bio, avatar_url: avatar_url.destroy_some() }
+                Bio::Image { name, bio, avatar_url }
             );
+            emit(BioChangeEvent::Image {
+                owner: caller_address,
+                object: object_address,
+                name,
+                bio,
+                avatar_url
+            })
         };
 
         let names_length = names.length();
@@ -132,6 +184,10 @@ module profile_address::profile {
         map.add_all(names, converted_links);
 
         move_to(&object_signer, LinkTree::SM { links: map });
+        emit(LinkTreeChangeEvent::SM {
+            owner: caller_address,
+            object: object_address
+        });
         move_to(caller, ProfileRef { object_address: signer::address_of(&object_signer) });
     }
 
@@ -197,16 +253,34 @@ module profile_address::profile {
         // If it's an NFT, lock it up for usage, otherwise use an image
         if (avatar_nft.is_some()) {
             let nft = avatar_nft.destroy_some();
+            let nft_address = object::object_address(&nft);
             connect_nft(caller, nft);
             move_to(
                 &object_signer,
                 Bio::NFT { name, bio, avatar_nft: nft }
-            )
+            );
+
+            emit(BioChangeEvent::NFT {
+                owner: caller_address,
+                object: profile_address,
+                name,
+                bio,
+                avatar_nft: nft_address
+            })
         } else if (avatar_url.is_some()) {
+            let avatar_url = avatar_url.destroy_some();
             move_to(
                 &object_signer,
-                Bio::Image { name, bio, avatar_url: avatar_url.destroy_some() }
+                Bio::Image { name, bio, avatar_url }
             );
+
+            emit(BioChangeEvent::Image {
+                owner: caller_address,
+                object: profile_address,
+                name,
+                bio,
+                avatar_url
+            })
         }
     }
 
@@ -228,6 +302,11 @@ module profile_address::profile {
         for (i in 0..num_names) {
             profile.links.upsert(names[i], annotated_links[i])
         };
+
+        emit(LinkTreeChangeEvent::SM {
+            owner: caller_address,
+            object: profile_address
+        });
     }
 
     /// Remove a set of links
@@ -240,6 +319,10 @@ module profile_address::profile {
         let profile = borrow_global_mut<LinkTree>(profile_address);
         names.for_each_ref(|name| {
             profile.links.remove(name);
+        });
+        emit(LinkTreeChangeEvent::SM {
+            owner: caller_address,
+            object: profile_address
         });
     }
 
@@ -260,6 +343,10 @@ module profile_address::profile {
 
         // Cleanup refernce to object
         move_from<ProfileRef>(caller_address);
+        emit(DeleteProfileEvent::V1 {
+            owner: caller_address,
+            object: profile_address
+        })
     }
 
     #[view]
