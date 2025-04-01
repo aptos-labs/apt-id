@@ -13,9 +13,10 @@ import { useState } from "react";
 import { useAptosName } from "../hooks/useAptosName";
 import Image from "next/image";
 import { useRouter } from 'next/navigation';
+import { NETWORK } from "@/constants";
 
 export function WalletSelector() {
-  const { wallets, connect, account, connected, disconnect, wallet } = useWallet();
+  const { wallets, connect, account, connected, disconnect, wallet, network } = useWallet();
   const { ansName, loading } = useAptosName();
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
@@ -24,19 +25,26 @@ export function WalletSelector() {
       <div className="flex flex-col items-center gap-2">
         <Button 
           onClick={() => setIsOpen(true)}
-          className="w-[200px] px-4 py-[14px] sm:py-4 text-[14px] sm:text-[16px] font-semibold 
+          className="w-[240px] px-4 py-[14px] sm:py-4 text-[14px] sm:text-[16px] font-semibold 
                    text-center bg-white/90 hover:bg-white text-[#000000] rounded-[14px] 
                    transition-all duration-200 shadow-md hover:scale-[1.02]"
         >
-          <div className="w-full flex items-center gap-2">
-            <Image 
-              src={wallet?.icon || '/favicon.ico'} 
-              alt={`${wallet?.name} logo`}
-              width={24}
-              height={24}
-              className="w-6 h-6"
-            />
-            {loading ? "Loading..." : ansName || `${account.address.slice(0, 6)}...${account.address.slice(-4)}`}
+          <div className="w-full flex flex-col items-center">
+            <div className="w-full flex items-center gap-2">
+              <Image 
+                src={wallet?.icon || '/favicon.ico'} 
+                alt={`${wallet?.name} logo`}
+                width={24}
+                height={24}
+                className="w-6 h-6"
+              />
+              {loading ? "Loading..." : ansName || `${account.address.slice(0, 6)}...${account.address.slice(-4)}`}
+            </div>
+            <div className="text-xs mt-1 text-gray-500">
+              Network: <span className={network?.name === NETWORK ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
+                {network?.name || "Unknown"}
+              </span>
+            </div>
           </div>
         </Button>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>

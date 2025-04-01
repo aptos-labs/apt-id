@@ -2,6 +2,7 @@
 
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { useState, useEffect } from "react";
+import { NETWORK } from "@/constants";
 
 export function useAptosName() {
   const { account } = useWallet();
@@ -14,7 +15,9 @@ export function useAptosName() {
 
       setLoading(true);
       try {
-        const response = await fetch(`https://www.aptosnames.com/api/mainnet/v1/primary-name/${account.address}`);
+        // Use the NETWORK constant to determine which API endpoint to use
+        // This makes it easy to switch between mainnet and testnet
+        const response = await fetch(`https://www.aptosnames.com/api/${NETWORK}/v1/primary-name/${account.address}`);
         const data = await response.json();
         setAnsName(data.name);
       } catch (error) {
