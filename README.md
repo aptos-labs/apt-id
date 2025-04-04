@@ -1,6 +1,6 @@
 # Apt ID
 
-![Apt ID](typescript/public/aptos.png)
+![Screenshot](Screenshot.png)
 
 ## What is Apt ID?
 
@@ -170,3 +170,5 @@ For feature requests or bug reports, open a GitHub issue [here](https://github.c
 ## License
 
 [MIT License](typescript/LICENSE)
+
+![Apt ID](typescript/public/aptos.png)
