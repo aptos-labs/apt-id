@@ -20,6 +20,7 @@ export function WalletSelector() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   if (connected && account) {
+      const address = account.address.toString()
     return (
       <div className="flex flex-col items-center gap-2">
         <Button 
@@ -36,7 +37,7 @@ export function WalletSelector() {
               height={24}
               className="w-6 h-6"
             />
-            {loading ? "Loading..." : ansName || `${account.address.slice(0, 6)}...${account.address.slice(-4)}`}
+            {loading ? "Loading..." : ansName || `${address.slice(0, 6)}...${address.slice(-4)}`}
           </div>
         </Button>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>

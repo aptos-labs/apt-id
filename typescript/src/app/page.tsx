@@ -30,7 +30,7 @@ export default function Home() {
         setLoading(true);
       }
       try {
-        const [bio, links] = await fetchBioAndLinks(account.address);
+        const [bio, links] = await fetchBioAndLinks(account.address.toString());
 
         if (bio?.error || !bio) {
           console.log("Bio fetch error:", bio.error);
