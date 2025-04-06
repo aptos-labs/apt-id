@@ -50,28 +50,6 @@ impl Profile {
             None
         }
     }
-
-    pub fn from_changes(
-        write_set_change: &WriteSetChange,
-        transaction_version: i64,
-        transaction_block_height: i64,
-    ) -> Option<Profile> {
-        if let Some(write_set_change::Change::WriteResource(ref write_resource)) =
-            write_set_change.change
-        {
-            let data: BioInfo = serde_json::from_str(write_resource.data.as_str()).ok()?;
-
-            Some(Profile {
-                account_address: write_resource.address.clone(),
-                transaction_version,
-                transaction_block_height,
-                name: data.name,
-                avatar_url: data.avatar_url, // TODO: Limit avatar URL length
-            })
-        } else {
-            None
-        }
-    }
 }
 
 // Prevent conflicts with other things named `Event`
