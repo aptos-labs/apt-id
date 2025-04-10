@@ -12,7 +12,7 @@ The codebase for [Apt ID](https://aptid.xyz), a profile based experience attache
 
 The platform uses Aptos blockchain technology to store profile data on-chain, giving users complete control over their profiles.
 
-> "So the ANS name gives you basically claim to the namespace and then you can put anything you want there. Like there's no protections about what you can put there. **Don't put anything bad please.** But it's fully decentralized so like you can change it whenever you want, you can create it, delete it, whatever. *- Greg*"
+> "So the ANS name gives you basically claim to the namespace and then you can put anything you want there. Like there's no protections about what you can put there. **Don't put anything bad please.** But it's fully decentralized so like you can change it whenever you want, you can create it, delete it, whatever." *- Greg*
 
 ## Features
 
@@ -110,7 +110,7 @@ profile_address = "_"
 ```
 
 > "The underscore means it's a placeholder. That means that it needs to be filled in with an address at time of publish, but you can use it within the code for ease of use. This is particularly useful because you might have different addresses between environments. If we have a placeholder, I can easily just change it." *- Greg*
-*
+
 ### Zero Address Ownership
 
 A unique pattern used for NFT handling:
