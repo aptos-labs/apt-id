@@ -9,16 +9,14 @@ profile_address = "_"
 [dev-addresses]
 profile_address = "0x1234567890abcdef"
 
-# TODO: For production/mainnet deployment, change these values back to:
-# rev = "mainnet"
 [dependencies.AptosFramework]
 git = "https://github.com/aptos-labs/aptos-framework.git"
-rev = "testnet"
+rev = "mainnet"
 subdir = "aptos-framework"
 
 [dependencies.AptosTokenObjects]
 git = "https://github.com/aptos-labs/aptos-framework.git"
-rev = "testnet"
+rev = "mainnet"
 subdir = "aptos-token-objects"
 
 [dev-dependencies]
