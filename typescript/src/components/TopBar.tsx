@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import type React from 'react';
 import { useRouter } from 'next/navigation';
 import { WalletSelector } from './WalletSelector';
 import Image from 'next/image';

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Profile } from '@/types';
 import { TopBar } from "./TopBar";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";

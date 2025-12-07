@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { WalletProvider } from "../components/WalletProvider";
 import "./globals.css";
-import React from "react";
+import type React from "react";
 
 export const metadata: Metadata = {
   title: "Apt ID",
