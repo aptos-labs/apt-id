@@ -1,6 +1,64 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  /* Colors */
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  /* Font Families */
+  --font-family-inter: Inter, sans-serif;
+  
+  /* Font Sizes */
+  --font-size-12: 0.75rem;
+  --font-size-14: 0.875rem;
+  --font-size-16: 1rem;
+  --font-size-18: 1.125rem;
+  --font-size-20: 1.25rem;
+  --font-size-24: 1.5rem;
+  --font-size-26: 1.625rem;
+  --font-size-30: 1.875rem;
+  --font-size-39: 2.4375rem;
+  --font-size-48: 3rem;
+  --font-size-51: 3.1875rem;
+  --font-size-68: 4.25rem;
+  --font-size-110: 6.875rem;
+
+  --line-height-16: 1rem;
+  --line-height-18: 1.125rem;
+  --line-height-20: 1.25rem;
+  --line-height-22: 1.375rem;
+  --line-height-24: 1.5rem;
+  --line-height-26: 1.625rem;
+  --line-height-28: 1.75rem;
+  --line-height-32: 2rem;
+  --line-height-34: 2.125rem;
+  --line-height-42: 2.625rem;
+  --line-height-52: 3.25rem;
+  --line-height-62: 3.875rem;
+  --line-height-72: 4.5rem;
+  --line-height-116: 7.25rem;
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
 
 @layer base {
   :root {
@@ -69,9 +127,110 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@layer utilities {
+  .animate-accordion-down {
+    animation: accordion-down 0.2s ease-out;
+  }
+  .animate-accordion-up {
+    animation: accordion-up 0.2s ease-out;
+  }
+}
+
+@layer components {
+  /* Component Regular Text Styles */
+  .body-sm {
+    font-family: var(--font-family-inter);
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-28);
+    font-weight: 400;
+  }
+
+  .body-md {
+    font-family: var(--font-family-inter);
+    font-size: var(--font-size-18);
+    line-height: var(--line-height-28);
+    font-weight: 400;
+  }
+
+  /* Component Semibold Text Styles */
+  .body-sm-semibold {
+    font-family: var(--font-family-inter);
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-28);
+    font-weight: 600;
+  }
+
+  .body-md-semibold {
+    font-family: var(--font-family-inter);
+    font-size: var(--font-size-18);
+    line-height: var(--line-height-28);
+    font-weight: 600;
+  }
+
+  /* Label Text Styles */
+  .label-sm {
+    font-family: var(--font-family-inter);
+    font-size: var(--font-size-14);
+    line-height: var(--line-height-24);
+    color: hsl(var(--secondary-text));
+  }
+
+  /* Title Text Styles */
+  .title-md {
+    font-family: var(--font-family-inter);
+    font-size: var(--font-size-48);
+    line-height: var(--font-size-48);
+    font-weight: 700;
+    letter-spacing: -0.012em;
+  }
+
+  /* Heading Text Styles */
+  .heading-sm {
+    font-family: var(--font-family-inter);
+    font-size: var(--font-size-24);
+    line-height: var(--line-height-32);
+    font-weight: 600;
+    letter-spacing: -0.006em;
+  }
+
+  .heading-md {
+    font-family: var(--font-family-inter);
+    font-size: var(--font-size-30);
+    line-height: 2.25rem;
+    font-weight: 600;
+  }
+
+  /* Display Text Styles */
+  .display {
+    font-family: var(--font-family-inter);
+    font-size: 32px;
+    line-height: 52px;
+    font-weight: 700;
   }
 }
