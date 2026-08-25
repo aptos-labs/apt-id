@@ -14,7 +14,7 @@ Allow editing the profile title/name instead of always using the Aptos Name.
 - [x] Add display-name helpers and unit tests
 - [x] Add editor input; save custom name via `create` / `set_bio`
 - [x] Show custom name on public profile, metadata, and search
-- [ ] Lint, format, build, and verify UI
+- [x] Lint, format, build, and verify UI
 
 ### Notes
 - No Move contract change: `set_bio` / `create` already take `name`
@@ -24,7 +24,9 @@ Allow editing the profile title/name instead of always using the Aptos Name.
 ### Progress Log
 1. Issue #36: main name was ANS-only (e.g. no capitalization)
 2. Frontend always wrote `ansName` into `Bio.name` and rendered ANS in the H1
-3. Added `src/lib/displayName.ts` helpers and `node:test` coverage
+4. `pnpm lint` / `pnpm test` (12 tests) / `pnpm build` passed
+5. Production server: `/` connect gate, `/greg` still renders on-chain name `greg` (no extra handle when it matches ANS), unknown names 404
+6. Opened PR https://github.com/aptos-labs/apt-id/pull/61
 
 ---
 
