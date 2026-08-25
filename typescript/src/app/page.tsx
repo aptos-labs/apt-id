@@ -15,7 +15,7 @@ export default function Home() {
   const router = useRouter();
   const { ansName, loading: ansLoading } = useAptosName();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -62,9 +62,6 @@ export default function Home() {
     if (connected && account?.address) {
       fetchProfile().then(() => {
       });
-    } else {
-      setLoaded(true);
-      setLoading(false);
     }
   }, [connected, account?.address, ansName, loaded]);
 
@@ -109,8 +106,13 @@ export default function Home() {
     return (
       <div className="flex flex-col gap-6">
         <h1 className="text-3xl font-bold text-white text-center">Edit Your Profile</h1>
-        <ProfileEditor ansName={ansName} profile={profile || undefined} onViewProfile={handleViewProfile}
-                       loading={loading || ansLoading} />
+        <ProfileEditor
+          key={profile ? profile.owner : `new-${ansName}`}
+          ansName={ansName}
+          profile={profile || undefined}
+          onViewProfile={handleViewProfile}
+          loading={loading || ansLoading}
+        />
       </div>
     );
   };

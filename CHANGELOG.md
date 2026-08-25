@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Editable display name on profiles (capitalization and custom titles), stored in the existing on-chain `Bio.name` field
 - `CLAUDE.md` - AI agent instructions and project documentation
 - `AGENTS.md` - Symlink to CLAUDE.md for alternative agent systems
 - `SCRATCHPAD.md` - Agent process tracking file
@@ -19,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Raised TypeScript dependency floors for patched Next.js 16.3.x and react-router-dom 7.18.x
+- Added `typescript-eslint` so `pnpm lint` can load `eslint.config.mjs`
 
 ### Deprecated
 - None

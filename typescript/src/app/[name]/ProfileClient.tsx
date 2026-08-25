@@ -34,10 +34,7 @@ export default function ProfileClient({ profile: initialProfile }: { profile: Pr
 
     if (loading) {
       fetchLatestProfile();
-    } else {
-      setLoading(false);
     }
-
   }, [profile.owner, profile, loading]);
 
   if (loading) {

@@ -1,11 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Profile, ProfileLink } from '@/types';
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Link as LinkIcon } from 'lucide-react';
 import {CONTRACT_ADDRESS} from "@/constants.ts";
-import Image from "next/image"; // Add LinkIcon
+import Image from "next/image";
+import {
+  DISPLAY_NAME_MAX_LENGTH,
+  formatAnsHandle,
+  resolveNameToSave,
+  stripAptSuffix,
+} from "@/lib/displayName.ts";
 
 interface ProfileEditorProps {
   ansName: string;
@@ -16,21 +22,13 @@ interface ProfileEditorProps {
 
 export function ProfileEditor({ ansName, profile, onViewProfile, loading = false }: ProfileEditorProps) {
   const { account, signAndSubmitTransaction } = useWallet();
-  const [bio, setBio] = useState<string>('');
-  const [avatar, setAvatar] = useState<string>('');
-  const [links, setLinks] = useState<ProfileLink[]>([]);
+  const fallbackName = stripAptSuffix(ansName);
+  const [displayName, setDisplayName] = useState<string>(profile?.name?.trim() || fallbackName);
+  const [bio, setBio] = useState<string>(profile?.description || '');
+  const [avatar, setAvatar] = useState<string>(profile?.profilePicture || '');
+  const [links, setLinks] = useState<ProfileLink[]>(profile?.links || []);
   const [saving, setSaving] = useState(false);
   const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
-
-  // Initialize state with profile data when it becomes available
-  useEffect(() => {
-    console.log('Profile data received:', profile);
-    if (profile) {
-      setBio(profile.description || '');
-      setAvatar(profile.profilePicture || '');
-      setLinks(profile.links || []);
-    }
-  }, [profile]);
 
   const handleAddLink = () => {
     const newLink: ProfileLink = {
@@ -58,6 +56,8 @@ export function ProfileEditor({ ansName, profile, onViewProfile, loading = false
     setSaving(true);
 
     try {
+      const nameToSave = resolveNameToSave(displayName, ansName);
+
       // Check if profile exists using view function
       const response = await fetch(`/api/profile/exists?address=${account.address}`);
       let profileExists = false;
@@ -74,7 +74,7 @@ export function ProfileEditor({ ansName, profile, onViewProfile, loading = false
             function: `${CONTRACT_ADDRESS}::profile::create`,
             typeArguments: [],
             functionArguments: [
-              ansName,              // name: String
+              nameToSave,           // name: String
               bio,                  // bio: String
               avatar,               // avatar_url: Option<String>
               undefined,            // avatar_nft: Option<Object<Token>> - always empty for now
@@ -90,7 +90,7 @@ export function ProfileEditor({ ansName, profile, onViewProfile, loading = false
             function: `${CONTRACT_ADDRESS}::profile::set_bio`,
             typeArguments: [],
             functionArguments: [
-              ansName,     // name: String
+              nameToSave,           // name: String
               bio,                  // bio: String
               avatar,               // avatar_url: Option<String>
               undefined             // avatar_nft: Option<Object<Token>> - always empty for now
@@ -150,6 +150,21 @@ export function ProfileEditor({ ansName, profile, onViewProfile, loading = false
         
         {/* Profile Info */}
         <div className="text-center w-full max-w-[400px] mx-auto">
+          <input
+            type="text"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            placeholder={stripAptSuffix(ansName) || "Display name"}
+            maxLength={DISPLAY_NAME_MAX_LENGTH}
+            aria-label="Display name"
+            className="text-[20px] sm:text-[24px] font-semibold text-white bg-white/10
+                     text-center w-full focus:outline-none focus:ring-1
+                     focus:ring-white/20 rounded-lg px-4 py-2 mb-1
+                     backdrop-blur-sm placeholder:text-white/40"
+          />
+          <p className="text-[13px] sm:text-[14px] text-white/60 mb-3">
+            {formatAnsHandle(ansName)}
+          </p>
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
