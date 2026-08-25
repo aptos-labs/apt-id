@@ -19,6 +19,9 @@ Add prefix-based primary social accounts (X, Telegram, GitHub) per issue #51.
 - Primary socials use LinkTree keys prefixed with `__primary:`
 - Frontend filters those keys out of the regular links list
 - Contract view is additive; frontend works against the currently deployed module by parsing `view_links`
+- Rebased onto `main` (display-name #61 + dependency bumps). Combined UI: display name, ANS handle subtitle, primary-social icon row.
+- GitHub PR #62 had no review threads; prior hardening (host checks, single `create()`, `url` arg, no `loaded` fetch dep) kept through rebase.
+- After rebase: `pnpm lint`, `pnpm test` (21), `tsc --noEmit`, `pnpm build`, `aptos move test` (3), Vercel checks green.
 
 ---
 
