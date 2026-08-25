@@ -329,11 +329,11 @@ module profile_address::profile {
         });
     }
 
-    /// Set a primary social account (convenience wrapper around add_links)
+    /// Set a primary social account. `url` is stored as the LinkTree value (full URL recommended).
     public entry fun set_primary_social(
-        caller: &signer, platform: String, handle: String
+        caller: &signer, platform: String, url: String
     ) acquires ProfileRef, LinkTree {
-        add_links(caller, vector[primary_social_key(platform)], vector[handle]);
+        add_links(caller, vector[primary_social_key(platform)], vector[url]);
     }
 
     /// Remove a primary social account (convenience wrapper around remove_links)

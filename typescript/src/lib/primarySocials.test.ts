@@ -38,6 +38,25 @@ test("toPrimarySocialUrl builds a platform URL and strips a leading @", () => {
 
 test("toPrimarySocialUrl keeps an already-absolute URL", () => {
   assert.equal(toPrimarySocialUrl("x", "https://x.com/aptoslabs"), "https://x.com/aptoslabs");
+  assert.equal(toPrimarySocialUrl("x", "https://twitter.com/aptoslabs"), "https://twitter.com/aptoslabs");
+});
+
+test("toPrimarySocialUrl rejects absolute URLs on the wrong host", () => {
+  assert.equal(toPrimarySocialUrl("x", "https://evil.com/aptoslabs"), null);
+  assert.equal(toPrimarySocialUrl("github", "https://x.com/aptoslabs"), null);
+});
+
+test("buildPrimarySocialUpdates skips unsafe absolute URLs", () => {
+  const result = buildPrimarySocialUpdates({ x: "https://evil.com/aptos" });
+  assert.deepEqual(result.toUpsert, { names: [], urls: [] });
+});
+
+test("splitProfileLinks ignores a key that only contains the prefix in the middle", () => {
+  const { regularLinks, primarySocials } = splitProfileLinks([
+    { id: "my__primary:site", title: "my__primary:site", url: "https://example.com" },
+  ]);
+  assert.deepEqual(regularLinks, [{ id: "my__primary:site", title: "my__primary:site", url: "https://example.com" }]);
+  assert.deepEqual(primarySocials, {});
 });
 
 test("extractPrimarySocialHandle recovers handles from stored URLs", () => {
