@@ -12,9 +12,9 @@ Fix `pnpm audit` issues in the TypeScript frontend.
 ### Tasks
 - [x] Run `pnpm audit` and identify findings
 - [x] Update `typescript/package.json` dependency floors and pnpm overrides
-- [ ] Re-run `pnpm audit` (expect zero findings)
-- [ ] Lint / build verification
-- [ ] Commit, push, and open PR
+- [x] Re-run `pnpm audit` (zero findings)
+- [x] Production `pnpm build` and route smoke checks
+- [x] Commit, push, and open PR (#60)
 
 ### Notes
 - `pnpm audit` reported one moderate finding: `uuid@9.0.1` via `@aptos-labs/wallet-adapter-react` → `@identity-connect/dapp-sdk` (GHSA-w5hq-g745-h8pq / CVE-2026-41907). Patched in `>=11.1.1`.
@@ -24,6 +24,8 @@ Fix `pnpm audit` issues in the TypeScript frontend.
 - `pnpm-lock.yaml` remains gitignored; only `package.json` is committed, matching prior remediations.
 
 ### Progress Log
-1. Installed TypeScript deps and ran `pnpm audit`
+1. Installed TypeScript deps and ran `pnpm audit` (1 moderate: uuid@9.0.1)
 2. Updated Next.js / react-router-dom floors and pnpm overrides
-3. Next: reinstall, re-audit, lint/build, commit
+3. Reinstall resolved `uuid@11.1.1`; `pnpm audit` reports no known vulnerabilities
+4. `pnpm build` succeeded on Next.js 16.3.3; home `/`, `/greg`, and `/manifest.json` returned 200
+5. Opened PR https://github.com/aptos-labs/apt-id/pull/60
