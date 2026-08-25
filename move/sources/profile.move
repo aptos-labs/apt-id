@@ -5,7 +5,7 @@ module profile_address::profile {
 
     use std::option::{Self, Option};
     use std::signer;
-    use std::string::String;
+    use std::string::{Self, String};
     use aptos_std::simple_map::{Self, SimpleMap};
     use aptos_framework::event::emit;
     use aptos_framework::object::{Self, DeleteRef, ExtendRef, Object};
@@ -103,6 +103,9 @@ module profile_address::profile {
 
     /// Image URL and NFT can't both be given, only one or the other
     const E_IMAGE_AND_NFT: u64 = 4;
+
+    /// Prefix used to store primary social accounts in the LinkTree
+    const PRIMARY_SOCIAL_PREFIX: vector<u8> = b"__primary:";
 
     /// Creates an unordered profile
     ///
@@ -326,6 +329,20 @@ module profile_address::profile {
         });
     }
 
+    /// Set a primary social account (convenience wrapper around add_links)
+    public entry fun set_primary_social(
+        caller: &signer, platform: String, handle: String
+    ) acquires ProfileRef, LinkTree {
+        add_links(caller, vector[primary_social_key(platform)], vector[handle]);
+    }
+
+    /// Remove a primary social account (convenience wrapper around remove_links)
+    public entry fun remove_primary_social(
+        caller: &signer, platform: String
+    ) acquires ProfileRef, LinkTree {
+        remove_links(caller, vector[primary_social_key(platform)]);
+    }
+
     /// Delete the Profile and return the NFTs if any
     public entry fun delete(caller: &signer) acquires ProfileRef, Bio, LinkTree, Controller {
         let caller_address = signer::address_of(caller);
@@ -398,6 +415,34 @@ module profile_address::profile {
         }
     }
 
+    #[view]
+    /// Returns primary social accounts stored as LinkTree keys with the "__primary:" prefix
+    public fun get_primary_socials(owner: address): SimpleMap<String, String> acquires ProfileRef, LinkTree {
+        let maybe_profile_address = get_profile_address(owner);
+        if (maybe_profile_address.is_none()) {
+            return simple_map::new()
+        };
+
+        let profile_address = maybe_profile_address.destroy_some();
+        let link_tree = borrow_global<LinkTree>(profile_address);
+        let primary_socials = simple_map::new<String, String>();
+        let prefix = string::utf8(PRIMARY_SOCIAL_PREFIX);
+        let prefix_len = prefix.length();
+        let keys = link_tree.links.keys();
+
+        for (i in 0..keys.length()) {
+            let key = keys[i];
+            if (key.length() >= prefix_len && key.sub_string(0, prefix_len) == prefix) {
+                let platform = key.sub_string(prefix_len, key.length());
+                if (platform.length() > 0) {
+                    primary_socials.upsert(platform, link_tree.links.borrow(&key).url);
+                }
+            }
+        };
+
+        primary_socials
+    }
+
     /// Creates an untransferrable object
     fun create_object(owner_address: address): signer {
         let const_ref = object::create_object(owner_address);
@@ -414,6 +459,13 @@ module profile_address::profile {
 
         move_to(&object_signer, Controller { extend_ref, delete_ref });
         object_signer
+    }
+
+    /// Builds a LinkTree key for a primary social platform
+    fun primary_social_key(platform: String): String {
+        let key = string::utf8(PRIMARY_SOCIAL_PREFIX);
+        string::append(&mut key, platform);
+        key
     }
 
     /// Converts string links to Link type
@@ -448,5 +500,61 @@ module profile_address::profile {
                 object::delete(delete_ref)
             }
         }
+    }
+
+    #[test_only]
+    fun utf8(bytes: vector<u8>): String {
+        string::utf8(bytes)
+    }
+
+    #[test]
+    fun test_get_primary_socials_empty_without_profile() {
+        let socials = get_primary_socials(@0x123);
+        assert!(socials.length() == 0, 0);
+    }
+
+    #[test(user = @0x123)]
+    fun test_get_primary_socials_filters_prefixed_links(user: &signer) {
+        create(
+            user,
+            utf8(b"Alice"),
+            utf8(b"Hello"),
+            option::some(utf8(b"https://example.com/a.png")),
+            option::none<Object<Token>>(),
+            vector[utf8(b"Website"), utf8(b"__primary:x"), utf8(b"__primary:github")],
+            vector[
+                utf8(b"https://example.com"),
+                utf8(b"https://x.com/alice"),
+                utf8(b"https://github.com/alice")
+            ]
+        );
+
+        let socials = get_primary_socials(signer::address_of(user));
+        assert!(socials.length() == 2, 0);
+        assert!(*socials.borrow(&utf8(b"x")) == utf8(b"https://x.com/alice"), 1);
+        assert!(*socials.borrow(&utf8(b"github")) == utf8(b"https://github.com/alice"), 2);
+        assert!(!socials.contains_key(&utf8(b"Website")), 3);
+    }
+
+    #[test(user = @0x123)]
+    fun test_set_and_remove_primary_social(user: &signer) {
+        create(
+            user,
+            utf8(b"Alice"),
+            utf8(b"Hello"),
+            option::some(utf8(b"https://example.com/a.png")),
+            option::none<Object<Token>>(),
+            vector[],
+            vector[]
+        );
+
+        set_primary_social(user, utf8(b"telegram"), utf8(b"https://t.me/alice"));
+        let socials = get_primary_socials(signer::address_of(user));
+        assert!(socials.length() == 1, 0);
+        assert!(*socials.borrow(&utf8(b"telegram")) == utf8(b"https://t.me/alice"), 1);
+
+        remove_primary_social(user, utf8(b"telegram"));
+        let socials_after = get_primary_socials(signer::address_of(user));
+        assert!(socials_after.length() == 0, 2);
     }
 }

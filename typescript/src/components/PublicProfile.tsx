@@ -11,6 +11,13 @@ import { TwitterIcon, GithubIcon, FacebookIcon, InstagramIcon, LinkedinIcon } fr
 import { DiscordLogoIcon, PaperPlaneIcon, ExternalLinkIcon, Share1Icon, CopyIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { formatAnsHandle, getDisplayName, shouldShowAnsHandle } from "@/lib/displayName.ts";
+import { PrimarySocialIcon } from "./PrimarySocialIcon";
+import {
+  SUPPORTED_PRIMARY_SOCIALS,
+  isSafePrimarySocialUrl,
+  isSupportedPrimarySocial,
+  splitProfileLinks,
+} from "@/lib/primarySocials.ts";
 
 interface PublicProfileProps {
   profile: Profile;
@@ -27,6 +34,10 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
   
   // Check if the current user is the profile owner
   const isOwner = account?.address?.toString() === profile.owner;
+  const { regularLinks, primarySocials: parsedSocials } = splitProfileLinks(profile.links);
+  const primarySocials = Object.entries({ ...parsedSocials, ...profile.primarySocials }).filter(([platform, url]) =>
+    isSafePrimarySocialUrl(platform, url),
+  );
 
   const handleEdit = () => {
     router.push('/');
@@ -208,6 +219,26 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
               {showAnsHandle && (
                 <p className="text-[13px] sm:text-[14px] text-white/60 mt-1">{ansHandle}</p>
               )}
+              {primarySocials.length > 0 && (
+                <div className="flex items-center justify-center gap-3 mt-3">
+                  {primarySocials.map(([platform, url]) => (
+                    <Link
+                      key={platform}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={
+                        isSupportedPrimarySocial(platform)
+                          ? SUPPORTED_PRIMARY_SOCIALS[platform].name
+                          : platform
+                      }
+                      className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/90 hover:bg-white text-black shadow-md transition-all hover:scale-105"
+                    >
+                      <PrimarySocialIcon platform={platform} />
+                    </Link>
+                  ))}
+                </div>
+              )}
               <div className="flex items-center justify-center gap-4 mt-3 mb-4">
                 <Tooltip.Provider>
                   <Tooltip.Root>
@@ -266,7 +297,7 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
 
           {/* Links Section */}
           <section className="space-y-3 mb-8 w-full max-w-[500px] mx-auto">
-            {profile.links.map((link) => (
+            {regularLinks.map((link) => (
               <div key={link.id} className="relative group flex items-center gap-2">
                 <Link href={link.url} target="_blank" rel="noopener noreferrer" className="block w-full">
                   <div
