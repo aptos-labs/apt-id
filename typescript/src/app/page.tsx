@@ -16,7 +16,7 @@ export default function Home() {
   const router = useRouter();
   const { ansName, loading: ansLoading } = useAptosName();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!connected || !account?.address) {

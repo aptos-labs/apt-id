@@ -24,8 +24,14 @@ export type PrimarySocialPlatform = keyof typeof SUPPORTED_PRIMARY_SOCIALS;
 
 export type PrimarySocials = { [platform: string]: string };
 
+const PLATFORM_HOSTS: Record<PrimarySocialPlatform, readonly string[]> = {
+  x: ["x.com", "twitter.com"],
+  telegram: ["t.me", "telegram.me"],
+  github: ["github.com"],
+};
+
 export function isSupportedPrimarySocial(platform: string): platform is PrimarySocialPlatform {
-  return platform in SUPPORTED_PRIMARY_SOCIALS;
+  return Object.prototype.hasOwnProperty.call(SUPPORTED_PRIMARY_SOCIALS, platform);
 }
 
 export function isPrimarySocialKey(key: string): boolean {
@@ -42,7 +48,7 @@ export function splitProfileLinks(links: ProfileLink[]): {
   for (const link of links) {
     const key = link.id || link.title;
     if (isPrimarySocialKey(key)) {
-      const platform = key.slice(PRIMARY_SOCIAL_PREFIX.length);
+      const platform = key.slice(PRIMARY_SOCIAL_PREFIX.length).toLowerCase();
       if (platform) {
         primarySocials[platform] = link.url;
       }
@@ -54,18 +60,35 @@ export function splitProfileLinks(links: ProfileLink[]): {
   return { regularLinks, primarySocials };
 }
 
-export function toPrimarySocialUrl(platform: string, handleOrUrl: string): string {
+export function isSafePrimarySocialUrl(platform: string, url: string): boolean {
+  if (!/^https:\/\//i.test(url) || !isSupportedPrimarySocial(platform)) {
+    return false;
+  }
+  try {
+    const host = new URL(url).hostname.replace(/^www\./i, "").toLowerCase();
+    return PLATFORM_HOSTS[platform].some((allowed) => host === allowed || host.endsWith(`.${allowed}`));
+  } catch {
+    return false;
+  }
+}
+
+export function toPrimarySocialUrl(platform: string, handleOrUrl: string): string | null {
   const trimmed = handleOrUrl.trim();
+  if (!trimmed) {
+    return null;
+  }
+
   if (/^https?:\/\//i.test(trimmed)) {
-    return trimmed;
+    const httpsUrl = trimmed.replace(/^http:\/\//i, "https://");
+    return isSafePrimarySocialUrl(platform, httpsUrl) ? httpsUrl : null;
   }
 
   const handle = trimmed.replace(/^@+/, "");
-  if (isSupportedPrimarySocial(platform)) {
-    return `${SUPPORTED_PRIMARY_SOCIALS[platform].baseUrl}${handle}`;
+  if (!handle || /[/?#]/.test(handle) || !isSupportedPrimarySocial(platform)) {
+    return null;
   }
 
-  return trimmed;
+  return `${SUPPORTED_PRIMARY_SOCIALS[platform].baseUrl}${handle}`;
 }
 
 export function extractPrimarySocialHandle(platform: string, value: string): string {
@@ -74,22 +97,18 @@ export function extractPrimarySocialHandle(platform: string, value: string): str
     return "";
   }
 
-  const prefixes: Array<string | undefined> = [
-    isSupportedPrimarySocial(platform) ? SUPPORTED_PRIMARY_SOCIALS[platform].baseUrl : undefined,
-  ];
-  if (platform === "x") {
-    prefixes.push("https://twitter.com/", "https://www.twitter.com/", "https://www.x.com/");
-  }
-  if (platform === "telegram") {
-    prefixes.push("https://telegram.me/", "https://www.t.me/");
-  }
-  if (platform === "github") {
-    prefixes.push("https://www.github.com/");
-  }
-
-  for (const prefix of prefixes) {
-    if (prefix && trimmed.startsWith(prefix)) {
-      return trimmed.slice(prefix.length).replace(/^@+/, "").replace(/\/+$/, "");
+  if (/^https?:\/\//i.test(trimmed)) {
+    try {
+      const parsed = new URL(trimmed);
+      const host = parsed.hostname.replace(/^www\./i, "").toLowerCase();
+      if (
+        isSupportedPrimarySocial(platform) &&
+        PLATFORM_HOSTS[platform].some((allowed) => host === allowed || host.endsWith(`.${allowed}`))
+      ) {
+        return parsed.pathname.replace(/^\/+/, "").replace(/\/+$/, "");
+      }
+    } catch {
+      return trimmed.replace(/^@+/, "");
     }
   }
 
@@ -112,9 +131,10 @@ export function buildPrimarySocialUpdates(
   for (const platform of platforms) {
     const handle = (handles[platform] ?? "").trim();
     const key = `${PRIMARY_SOCIAL_PREFIX}${platform}`;
-    if (handle) {
+    const url = handle ? toPrimarySocialUrl(platform, handle) : null;
+    if (url) {
       names.push(key);
-      urls.push(toPrimarySocialUrl(platform, handle));
+      urls.push(url);
     } else if (previousUrls[platform]) {
       toRemove.push(key);
     }
