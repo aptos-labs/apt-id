@@ -10,6 +10,7 @@ import * as Tooltip from '@radix-ui/react-tooltip';
 import { TwitterIcon, GithubIcon, FacebookIcon, InstagramIcon, LinkedinIcon } from "lucide-react";
 import { DiscordLogoIcon, PaperPlaneIcon, ExternalLinkIcon, Share1Icon, CopyIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
+import { formatAnsHandle, getDisplayName, shouldShowAnsHandle } from "@/lib/displayName.ts";
 
 interface PublicProfileProps {
   profile: Profile;
@@ -20,8 +21,9 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
   const [shareText, setShareText] = useState("Share profile");
   const { account } = useWallet();
   const router = useRouter();
-  // Extract the username from ANS name (remove .apt)
-  const username = profile.ansName?.replace('.apt', '') ?? "N/A";
+  const displayName = getDisplayName(profile);
+  const ansHandle = formatAnsHandle(profile.ansName);
+  const showAnsHandle = shouldShowAnsHandle(displayName, profile.ansName);
   
   // Check if the current user is the profile owner
   const isOwner = account?.address?.toString() === profile.owner;
@@ -46,7 +48,7 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${username}'s Apt ID Profile`,
+          title: `${displayName}'s Apt ID Profile`,
           url: shareUrl,
         });
       } catch (err) {
@@ -153,7 +155,7 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
                 <button className="relative w-[96px] h-[96px] mb-4 sm:w-[120px] sm:h-[120px] rounded-full overflow-hidden hover:opacity-90 transition-opacity">
                   <Image
                     src={resolvedImageUrl}
-                    alt={`${username}'s profile picture`}
+                    alt={`${displayName}'s profile picture`}
                     width={120}
                     height={120}
                     className="rounded-full object-cover border-2 border-white shadow-lg w-full h-full"
@@ -167,7 +169,7 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
                     <div className="relative">
                       <Image
                         src={resolvedImageUrl}
-                        alt={`${username}'s profile picture`}
+                        alt={`${displayName}'s profile picture`}
                         width={500}
                         height={500}
                         className="rounded-lg object-contain max-h-[90vh]"
@@ -200,10 +202,13 @@ export default function PublicProfile({ profile }: PublicProfileProps) {
 
             {/* Profile Info */}
             <div className="text-center w-full max-w-[400px] mx-auto">
-              <h1 className="text-[20px] sm:text-[24px] font-semibold text-white mb-2">
-                {username}
+              <h1 className="text-[20px] sm:text-[24px] font-semibold text-white">
+                {displayName}
               </h1>
-              <div className="flex items-center justify-center gap-4 mb-4">
+              {showAnsHandle && (
+                <p className="text-[13px] sm:text-[14px] text-white/60 mt-1">{ansHandle}</p>
+              )}
+              <div className="flex items-center justify-center gap-4 mt-3 mb-4">
                 <Tooltip.Provider>
                   <Tooltip.Root>
                     <Tooltip.Trigger asChild>

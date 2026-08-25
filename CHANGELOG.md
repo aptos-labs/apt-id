@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Editable display name on profiles (capitalization and custom titles), stored in the existing on-chain `Bio.name` field
 - `CLAUDE.md` - AI agent instructions and project documentation
 - `AGENTS.md` - Symlink to CLAUDE.md for alternative agent systems
 - `SCRATCHPAD.md` - Agent process tracking file
@@ -18,7 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Move: compilation validation
 
 ### Changed
-- None
+- Raised TypeScript dependency floors for patched Next.js 16.3.x and react-router-dom 7.18.x
+- Added `typescript-eslint` so `pnpm lint` can load `eslint.config.mjs`
 
 ### Deprecated
 - None
@@ -30,4 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - None
 
 ### Security
-- None
+- Remediated `pnpm audit` findings in the TypeScript app:
+  - Forced transitive `uuid` to `^11.1.1` (GHSA-w5hq-g745-h8pq / CVE-2026-41907)
+  - Raised `axios` override to `>=1.18.0` and `form-data` to `>=4.0.6`
+  - Raised `next` / `eslint-config-next` to `^16.3.3` so installs cannot resolve Next.js versions affected by the July 2026 advisories
