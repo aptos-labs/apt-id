@@ -10,3 +10,5 @@ export const client = new Aptos(
     clientConfig: { API_KEY: APTOS_API_KEY },
   }),
 );
+
+export { PRIMARY_SOCIAL_PREFIX, SUPPORTED_PRIMARY_SOCIALS } from "./lib/primarySocials.ts";

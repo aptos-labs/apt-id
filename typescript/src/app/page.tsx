@@ -7,6 +7,7 @@ import { useAptosName } from "../hooks/useAptosName";
 import { ProfileEditor } from "../components/ProfileEditor";
 import { useEffect, useState } from "react";
 import { Profile } from "@/types";
+import { splitProfileLinks } from "@/lib/primarySocials.ts";
 import { fetchBioAndLinks } from "@/app/api/util.ts";
 import Link from "next/link";
 
@@ -16,30 +17,30 @@ export default function Home() {
   const { ansName, loading: ansLoading } = useAptosName();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(false);
-  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      if (!account?.address) {
-        setLoaded(false);
-        setLoading(false);
-        return;
-      }
+    if (!connected || !account?.address) {
+      return;
+    }
 
-      if (!loaded) {
-        setLoading(true);
-      }
+    let cancelled = false;
+
+    const fetchProfile = async () => {
+      setLoading(true);
       try {
         const [bio, links] = await fetchBioAndLinks(account.address.toString());
+        if (cancelled) {
+          return;
+        }
 
         if (bio?.error || !bio) {
           console.log("Bio fetch error:", bio.error);
           setProfile(null);
-          setLoading(false);
           return;
         }
 
-        // Create profile object
+        const { regularLinks, primarySocials } = splitProfileLinks(Array.isArray(links) ? links : []);
+
         const profileData: Profile = {
           owner: account.address.toString(),
           ansName: ansName,
@@ -47,23 +48,28 @@ export default function Home() {
           profilePicture: bio.avatar_url || "",
           description: bio.bio || "",
           title: bio.name || "",
-          links: Array.isArray(links) ? links : [],
+          links: regularLinks,
+          primarySocials,
         };
 
         setProfile(profileData);
       } catch (error) {
         console.error("Error fetching profile:", error);
-        setProfile(null);
+        if (!cancelled) {
+          setProfile(null);
+        }
       } finally {
-        setLoaded(true);
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
-    if (connected && account?.address) {
-      fetchProfile().then(() => {
-      });
-    }
-  }, [connected, account?.address, ansName, loaded]);
+
+    fetchProfile();
+    return () => {
+      cancelled = true;
+    };
+  }, [connected, account?.address, ansName]);
 
   const handleViewProfile = async () => {
     if (connected) {

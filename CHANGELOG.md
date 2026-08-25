@@ -2,12 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
 ### Added
+- Primary social accounts on Apt ID profiles (X, Telegram, GitHub)
+  - Stored in the existing LinkTree using `__primary:` keys, with a `get_primary_socials` view and optional `set_primary_social` / `remove_primary_social` entry functions
+  - Profile editor fields and a public-profile icon row, parsed from existing links so it works before a contract upgrade
 - Editable display name on profiles (capitalization and custom titles), stored in the existing on-chain `Bio.name` field
 - `CLAUDE.md` - AI agent instructions and project documentation
 - `AGENTS.md` - Symlink to CLAUDE.md for alternative agent systems
