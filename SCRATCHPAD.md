@@ -4,6 +4,30 @@ This file tracks the progress of AI agent work on this project.
 
 ---
 
+## Session: 2026-08-25 (display name)
+
+### Objective
+Allow editing the profile title/name instead of always using the Aptos Name.
+
+### Tasks
+- [x] Confirm on-chain `Bio.name` already stores a display name
+- [x] Add display-name helpers and unit tests
+- [x] Add editor input; save custom name via `create` / `set_bio`
+- [x] Show custom name on public profile, metadata, and search
+- [ ] Lint, format, build, and verify UI
+
+### Notes
+- No Move contract change: `set_bio` / `create` already take `name`
+- Public heading uses on-chain name; ANS handle is shown underneath when it differs
+- Blank editor field falls back to the Aptos name when saving
+
+### Progress Log
+1. Issue #36: main name was ANS-only (e.g. no capitalization)
+2. Frontend always wrote `ansName` into `Bio.name` and rendered ANS in the H1
+3. Added `src/lib/displayName.ts` helpers and `node:test` coverage
+
+---
+
 ## Session: 2026-08-25
 
 ### Objective
