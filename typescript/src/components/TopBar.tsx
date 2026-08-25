@@ -11,7 +11,8 @@ import { SearchIcon } from 'lucide-react';
 export function TopBar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<{ 
-    name: string; 
+    name: string;
+    displayName?: string;
     exists: boolean;
     bio?: string;
     avatar?: string;
@@ -37,6 +38,7 @@ export function TopBar() {
           const bio = await bioResponse.json();
           setSearchResults([{
             name: cleanQuery,
+            displayName: bio.name || cleanQuery,
             exists: response.ok,
             bio: bio.bio || '',
             avatar: bio.avatar_url || '/favicon.ico'
@@ -126,14 +128,17 @@ export function TopBar() {
                         {result.avatar && (
                           <Image
                             src={result.avatar}
-                            alt={result.name}
+                            alt={result.displayName || result.name}
                             width={32}
                             height={32}
                             className="rounded-full"
                           />
                         )}
                         <div className="flex flex-col">
-                          <span>{result.name}</span>
+                          <span>{result.displayName || result.name}</span>
+                          {result.displayName && result.displayName !== result.name && (
+                            <span className="text-xs text-gray-400">{result.name}.apt</span>
+                          )}
                           {result.bio && (
                             <span className="text-sm text-gray-500 truncate max-w-[300px]">
                               {result.bio}

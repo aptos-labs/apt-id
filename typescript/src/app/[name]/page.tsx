@@ -4,6 +4,7 @@ import { client } from "@/constants.ts";
 import { redirect } from "next/navigation";
 import NotFound from "@/app/not-found.tsx";
 import { getBio, getLinks } from "@/app/api/util.ts";
+import { getDisplayName } from "@/lib/displayName.ts";
 
 type Props = {
   params: Promise<{
@@ -28,8 +29,9 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
     const bio = await getBio(address.toString());
 
     if (bio) {
-      const title = `${name}'s Profile | Apt ID`;
-      const description = bio?.bio || `Check out ${name}'s profile on Apt ID`;
+      const displayName = getDisplayName({ name: bio.name, ansName: name });
+      const title = `${displayName}'s Profile | Apt ID`;
+      const description = bio?.bio || `Check out ${displayName}'s profile on Apt ID`;
       const imageUrl = bio?.avatar_url || `${baseUrl}/favicon.ico`;
 
       return {
@@ -45,7 +47,7 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
           description,
           images: [{
             url: imageUrl,
-            alt: `${name}'s profile picture`,
+            alt: `${displayName}'s profile picture`,
           }],
         },
       };
