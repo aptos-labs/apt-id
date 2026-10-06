@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import NotFound from "@/app/not-found.tsx";
 import { getBio, getLinks } from "@/app/api/util.ts";
 import { getDisplayName } from "@/lib/displayName.ts";
+import { splitProfileLinks } from "@/lib/primarySocials.ts";
 
 type Props = {
   params: Promise<{
@@ -98,6 +99,7 @@ export default async function ProfilePage(props: PageProps) {
     return <NotFound aptName={params.name} />;
   }
   const [bio, links] = await Promise.all([getBio(address).catch(() => undefined), getLinks(address).catch(() => [])]);
+  const { regularLinks, primarySocials } = splitProfileLinks(links ?? []);
 
   // Create a profile using the URL parameter as the ANS name
   const profile = {
@@ -107,7 +109,8 @@ export default async function ProfilePage(props: PageProps) {
     profilePicture: bio?.avatar_url ?? "",
     description: bio?.bio ?? "",
     title: bio?.name ?? "",
-    links: links ?? [],
+    links: regularLinks,
+    primarySocials,
   };
 
   if (!profile.owner || bio?.name === undefined) {

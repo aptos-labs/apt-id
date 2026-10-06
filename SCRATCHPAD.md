@@ -4,6 +4,27 @@ This file tracks the progress of AI agent work on this project.
 
 ---
 
+## Session: 2026-08-25 (primary socials)
+
+### Objective
+Add prefix-based primary social accounts (X, Telegram, GitHub) per issue #51.
+
+### Tasks
+- [x] Add Move `get_primary_socials` view and convenience entry functions with unit tests
+- [x] Add TypeScript constants, parsing helpers, editor fields, and public icon row
+- [x] Parse primary socials from existing LinkTree data (no extra view call required)
+- [ ] Indexer: no schema change needed (links already stored in LinkTree)
+
+### Notes
+- Primary socials use LinkTree keys prefixed with `__primary:`
+- Frontend filters those keys out of the regular links list
+- Contract view is additive; frontend works against the currently deployed module by parsing `view_links`
+- Rebased onto `main` (display-name #61 + dependency bumps). Combined UI: display name, ANS handle subtitle, primary-social icon row.
+- GitHub PR #62 had no review threads; prior hardening (host checks, single `create()`, `url` arg, no `loaded` fetch dep) kept through rebase.
+- After rebase: `pnpm lint`, `pnpm test` (21), `tsc --noEmit`, `pnpm build`, `aptos move test` (3), Vercel checks green.
+
+---
+
 ## Session: 2026-08-25 (display name)
 
 ### Objective

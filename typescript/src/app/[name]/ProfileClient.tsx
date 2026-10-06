@@ -4,38 +4,47 @@ import { useEffect, useState } from "react";
 import PublicProfile from "../../components/PublicProfile";
 import { Profile } from "@/types";
 import { fetchBioAndLinks } from "@/app/api/util.ts";
+import { splitProfileLinks } from "@/lib/primarySocials.ts";
 
 export default function ProfileClient({ profile: initialProfile }: { profile: Profile }) {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<Profile>(initialProfile);
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchLatestProfile = async () => {
       try {
-        const [bio, links] = await fetchBioAndLinks(profile.owner)
+        const [bio, links] = await fetchBioAndLinks(initialProfile.owner);
 
-        if (bio) {
-          // Update profile with latest data
-          setProfile({
-            ...profile,
-            name: bio.name,
-            profilePicture: bio.avatar_url || "", // TODO: Make a default
-            description: bio.bio,
-            title: bio.name,
-            links: links,
-          });
+        if (cancelled || !bio) {
+          return;
         }
+
+        const { regularLinks, primarySocials } = splitProfileLinks(Array.isArray(links) ? links : []);
+        setProfile({
+          ...initialProfile,
+          name: bio.name,
+          profilePicture: bio.avatar_url || "", // TODO: Make a default
+          description: bio.bio,
+          title: bio.name,
+          links: regularLinks,
+          primarySocials,
+        });
       } catch (error) {
         console.error("Error fetching latest profile:", error);
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
-    if (loading) {
-      fetchLatestProfile();
-    }
-  }, [profile.owner, profile, loading]);
+    fetchLatestProfile();
+    return () => {
+      cancelled = true;
+    };
+  }, [initialProfile]);
 
   if (loading) {
     return (

@@ -12,4 +12,5 @@ export interface Profile {
   description: string;
   title: string;
   links: ProfileLink[];
+  primarySocials: { [platform: string]: string };
 }
